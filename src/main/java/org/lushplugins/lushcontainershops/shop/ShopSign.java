@@ -8,7 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.HangingSign;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
@@ -104,11 +103,10 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
     }
 
     public Block getAttachedTo() {
-        BlockData blockData = this.sign.getBlockData();
         BlockFace attachedDirection;
         if (this.sign instanceof HangingSign) {
             attachedDirection = BlockFace.UP;
-        } else if (blockData instanceof WallSign signData) {
+        } else if (this.sign.getBlockData() instanceof WallSign signData) {
             attachedDirection = signData.getFacing().getOppositeFace();
         } else {
             attachedDirection = BlockFace.DOWN;
