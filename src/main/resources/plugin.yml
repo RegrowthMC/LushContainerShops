@@ -1,4 +1,4 @@
-name: PluginName
+name: LushContainerShops
 version: ${project.version}
-main: org.lushplugins.pluginname.PluginName
+main: org.lushplugins.lushcontainershops.LushContainerShops
 api-version: '1.17'

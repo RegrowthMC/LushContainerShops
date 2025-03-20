@@ -2,29 +2,34 @@ plugins {
     `java-library`
     `maven-publish`
     id("com.gradleup.shadow") version("8.3.0")
+    id("xyz.jpenilla.run-paper") version("2.2.4")
 }
 
 group = "org.lushplugins"
 version = "1.0.0"
 
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
     maven("https://oss.sonatype.org/content/groups/public/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
+    maven("https://repo.papermc.io/repository/maven-public/") // Paper
+    maven("https://repo.lushplugins.org/snapshots/") // LushLib
 }
 
 dependencies {
     // Dependencies
-    compileOnly("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
 
     // Soft Dependencies
 
     // Libraries
+    implementation("org.lushplugins:LushLib:0.10.57")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.9")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.9")
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
     registerFeature("optional") {
         usingSourceSet(sourceSets["main"])
@@ -36,10 +41,14 @@ java {
 tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
+
+        // Preserve parameter names in the bytecode (required by Lamp)
+        options.compilerArgs.add("-parameters")
     }
 
     shadowJar {
-        minimize()
+        relocate("org.lushplugins.lushlib", "org.lushplugins.lushcontainershops.libs.lushlib")
+        relocate("revxrsal", "org.lushplugins.lushcontainershops.libs.revxrsal")
 
         archiveFileName.set("${project.name}-${project.version}.jar")
     }
@@ -53,6 +62,10 @@ tasks {
         filesMatching("plugin.yml") {
             expand("version" to rootProject.version)
         }
+    }
+
+    runServer {
+        minecraftVersion("1.21.1")
     }
 }
 
