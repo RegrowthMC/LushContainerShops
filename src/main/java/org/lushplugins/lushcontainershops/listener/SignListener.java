@@ -55,11 +55,13 @@ public class SignListener implements Listener {
 
             if (data.getProduct() == null) {
                 data.setProduct(ShopItem.from(heldItem));
+                LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shopSign, ShopSignPrepareEvent.Step.ADD_PRODUCT));
                 shopSign.updateSign();
                 return;
             }
 
             data.setCost(ShopItem.from(heldItem));
+            LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shopSign, ShopSignPrepareEvent.Step.ADD_COST));
             shopSign.updateSign();
 
             // TODO: Send success message
@@ -81,34 +83,9 @@ public class SignListener implements Listener {
         }
 
         ShopData data = shopSign.data();
-        if (!shopSign.isEstablished()) {
+        if (!shopSign.isEstablished() || !player.getUniqueId().equals(data.getOwner())) {
             event.setCancelled(true);
-
-            if (!player.getUniqueId().equals(data.getOwner())) {
-                return;
-            }
-
-            ItemStack heldItem = player.getInventory().getItemInMainHand();
-            if (heldItem.getType().isAir()) {
-                // TODO: You must be holding an item message
-                return;
-            }
-
-            if (data.getProduct() == null) {
-                data.setProduct(ShopItem.from(heldItem));
-                shopSign.updateSign();
-                return;
-            }
-
-            data.setCost(ShopItem.from(heldItem));
-            shopSign.updateSign();
-
-            // TODO: Send success message
-            return;
         }
-
-        // TODO: Implement purchasing
-        return;
     }
 
     private void onShopSignCreate(SignChangeEvent event, Sign sign) {

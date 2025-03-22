@@ -4,6 +4,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3i;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.persistence.ShopItemPersistentDataType;
 import org.lushplugins.lushcontainershops.persistence.UUIDPersistentDataType;
@@ -12,6 +13,10 @@ import java.util.UUID;
 
 public class ShopData {
     private final UUID owner;
+    // TODO: If the sign is broken then the data should be removed from the container
+    // If the container is broken then the position should be removed from the sign
+    // If a sign has no saved position then it will search for a new container on right-click
+    private Vector3i containerPosition;
     private ShopItem product;
     private ShopItem cost;
 
