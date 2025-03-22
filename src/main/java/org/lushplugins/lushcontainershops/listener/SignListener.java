@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,50 @@ import org.lushplugins.lushcontainershops.shop.ShopData;
 import java.util.UUID;
 
 public class SignListener implements Listener {
+
+    @EventHandler
+    public void onSignInteract(PlayerInteractEvent event) {
+        Block block = event.getClickedBlock();
+        if (block == null) {
+            return;
+        }
+
+        ShopSign shopSign = ShopSign.from(block);
+        if (shopSign == null) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        ShopData data = shopSign.data();
+        if (!shopSign.isEstablished()) {
+            event.setCancelled(true);
+
+            if (!player.getUniqueId().equals(data.getOwner())) {
+                return;
+            }
+
+            ItemStack heldItem = player.getInventory().getItemInMainHand();
+            if (heldItem.getType().isAir()) {
+                // TODO: You must be holding an item message
+                return;
+            }
+
+            if (data.getProduct() == null) {
+                data.setProduct(ShopItem.from(heldItem));
+                shopSign.updateSign();
+                return;
+            }
+
+            data.setCost(ShopItem.from(heldItem));
+            shopSign.updateSign();
+
+            // TODO: Send success message
+            return;
+        }
+
+        // TODO: Implement purchasing
+        return;
+    }
 
     @EventHandler
     public void onSignOpen(PlayerOpenSignEvent event) {
