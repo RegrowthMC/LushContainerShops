@@ -1,12 +1,14 @@
 package org.lushplugins.lushcontainershops.command;
 
 import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.RayTraceResult;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.lushplugins.lushcontainershops.LushContainerShops;
+import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
+import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.Equipment;
+import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.RayTrace;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;
@@ -24,37 +26,42 @@ public class ContainerShopsCommand {
     }
 
     @Subcommand("setproduct")
-    public void setProduct(BukkitCommandActor actor) {
+    public String setProduct(BukkitCommandActor actor, @RayTrace Block block, @Equipment(EquipmentSlot.HAND) ItemStack heldItem) {
         Player player = actor.requirePlayer();
-        Block block = rayTraceBlock(player);
         if (block == null) {
-            actor.reply("Couldn't find shop sign"); // TODO: Test (Try working out compat with ChatColorHandler)
-            return;
+            return "Couldn't find shop sign";
         }
 
         ShopSign sign = ShopSign.from(block);
         if (sign == null) {
-            actor.reply("Couldn't find shop sign"); // TODO: Test (Try working out compat with ChatColorHandler)
-            return;
+            return "Couldn't find shop sign";
         }
 
         if (!player.getUniqueId().equals(sign.data().getOwner())) {
-            actor.reply("You are not the owner of this shop"); // TODO: Test (Try working out compat with ChatColorHandler)
-            return;
+            return "You are not the owner of this shop";
         }
 
-        // TODO: ContextualParameter to get held ItemStack? (eg. @MainHand and @OffHand?)
-        sign.data().setProduct(null); // TODO: Enter held item here
+        sign.data().setProduct(ShopItem.from(heldItem));
+        return "Successfully updated product!";
     }
 
     @Subcommand("setcost")
-    public void setCost(BukkitCommandActor actor) {
+    public String setCost(BukkitCommandActor actor, @RayTrace Block block, @Equipment(EquipmentSlot.HAND) ItemStack heldItem) {
+        Player player = actor.requirePlayer();
+        if (block == null) {
+            return "Couldn't find shop sign";
+        }
 
-    }
+        ShopSign sign = ShopSign.from(block);
+        if (sign == null) {
+            return "Couldn't find shop sign";
+        }
 
-    // TODO: Migrate to Lamp ContextualParameter
-    private @Nullable Block rayTraceBlock(LivingEntity entity) {
-        RayTraceResult rayTrace = entity.rayTraceBlocks(5);
-        return rayTrace != null ? rayTrace.getHitBlock() : null;
+        if (!player.getUniqueId().equals(sign.data().getOwner())) {
+            return "You are not the owner of this shop";
+        }
+
+        sign.data().setCost(ShopItem.from(heldItem));
+        return "Successfully updated cost!";
     }
 }

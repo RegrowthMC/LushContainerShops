@@ -48,7 +48,7 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
         } else {
             // TODO: Make line configurable?
             lines.set(1, Component.text("click product")
-                .color(NamedTextColor.RED)
+                .color(NamedTextColor.LIGHT_PURPLE)
                 .decorate(TextDecoration.ITALIC));
         }
 
@@ -58,7 +58,7 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
         } else if (product != null) {
             // TODO: Make line configurable?
             lines.set(2, Component.text("click cost")
-                .color(NamedTextColor.RED)
+                .color(NamedTextColor.LIGHT_PURPLE)
                 .decorate(TextDecoration.ITALIC));
         }
 
