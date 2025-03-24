@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.lushplugins.lushcontainershops.LushContainerShops;
+import org.lushplugins.lushcontainershops.shop.ShopData;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.Equipment;
@@ -37,11 +38,13 @@ public class ContainerShopsCommand {
             return "Couldn't find shop sign";
         }
 
-        if (!player.getUniqueId().equals(sign.data().getOwner())) {
+        ShopData data = sign.data();
+        if (!data.isOwner(player.getUniqueId())) {
             return "You are not the owner of this shop";
         }
 
-        sign.data().setProduct(ShopItem.from(heldItem));
+        data.setProduct(ShopItem.from(heldItem));
+        sign.updateSign();
         return "Successfully updated product!";
     }
 
@@ -57,11 +60,13 @@ public class ContainerShopsCommand {
             return "Couldn't find shop sign";
         }
 
-        if (!player.getUniqueId().equals(sign.data().getOwner())) {
+        ShopData data = sign.data();
+        if (!data.isOwner(player.getUniqueId())) {
             return "You are not the owner of this shop";
         }
 
-        sign.data().setCost(ShopItem.from(heldItem));
+        data.setCost(ShopItem.from(heldItem));
+        sign.updateSign();
         return "Successfully updated cost!";
     }
 }

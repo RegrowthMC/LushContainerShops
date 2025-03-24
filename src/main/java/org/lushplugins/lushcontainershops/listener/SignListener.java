@@ -33,36 +33,36 @@ public class SignListener implements Listener {
             return;
         }
 
-        ShopSign shopSign = ShopSign.from(block);
-        if (shopSign == null) {
+        ShopSign shop = ShopSign.from(block);
+        if (shop == null) {
             return;
         }
 
         Player player = event.getPlayer();
-        ShopData data = shopSign.data();
-        if (!shopSign.isEstablished()) {
+        ShopData data = shop.data();
+        if (!shop.isEstablished()) {
             event.setCancelled(true);
 
-            if (!player.getUniqueId().equals(data.getOwner())) {
+            if (!data.isOwner(player.getUniqueId())) {
                 return;
             }
 
             ItemStack heldItem = player.getInventory().getItemInMainHand();
             if (heldItem.getType().isAir()) {
-                // TODO: You must be holding an item message
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-item");
                 return;
             }
 
             if (data.getProduct() == null) {
                 data.setProduct(ShopItem.from(heldItem));
-                LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shopSign, ShopSignPrepareEvent.Step.ADD_PRODUCT));
-                shopSign.updateSign();
+                LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.ADD_PRODUCT));
+                shop.updateSign();
                 return;
             }
 
             data.setCost(ShopItem.from(heldItem));
-            LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shopSign, ShopSignPrepareEvent.Step.ADD_COST));
-            shopSign.updateSign();
+            LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.ADD_COST));
+            shop.updateSign();
 
             // TODO: Send success message
             return;
@@ -74,17 +74,16 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignOpen(PlayerOpenSignEvent event) {
-        Player player = event.getPlayer();
-        Sign sign = event.getSign();
-
-        ShopSign shopSign = ShopSign.from(sign);
-        if (shopSign == null) {
+        ShopSign shop = ShopSign.from(event.getSign());
+        if (shop == null) {
             return;
         }
 
-        ShopData data = shopSign.data();
-        if (!shopSign.isEstablished() || !player.getUniqueId().equals(data.getOwner())) {
+        Player player = event.getPlayer();
+        ShopData data = shop.data();
+        if (!shop.isEstablished() || !data.isOwner(player.getUniqueId())) {
             event.setCancelled(true);
+            return;
         }
     }
 
@@ -107,14 +106,14 @@ public class SignListener implements Listener {
             } catch (IllegalArgumentException ignored) {}
         }
 
-        ShopData shopData = new ShopData(owner, product, cost);
-        ShopSign shopSign = new ShopSign(sign, shopData);
+        ShopData data = new ShopData(owner, product, cost);
+        ShopSign shop = new ShopSign(sign, data);
 
         Event shopSignEvent;
         if (product != null && cost != null) {
-            shopSignEvent = new ShopSignCreateEvent(shopSign);
+            shopSignEvent = new ShopSignCreateEvent(shop);
         } else {
-            shopSignEvent = new ShopSignPrepareEvent(shopSign, ShopSignPrepareEvent.Step.PLACE);
+            shopSignEvent = new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.PLACE);
         }
 
         if (!LushContainerShops.getInstance().callEvent(shopSignEvent)) {
@@ -122,7 +121,7 @@ public class SignListener implements Listener {
             return;
         }
 
-        shopSign.updateSign(event.lines());
+        shop.updateSign(event.lines());
     }
 
     private void onShopSignEdit(SignChangeEvent event, ShopSign shopSign) {
@@ -131,22 +130,30 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignEdit(SignChangeEvent event) {
-        Sign sign = getPossibleShopSign(event.getBlock());
-        if (sign == null) {
+        Block block = event.getBlock();
+        if (!LushContainerShops.getInstance().getConfigManager().isWhitelistedSign(block.getType())) {
             return;
         }
 
-        ShopSign shopSign = ShopSign.from(sign);
-        if (shopSign == null) {
+        if (!(block.getWorld().getBlockState(block.getLocation()) instanceof Sign sign)) {
+            return;
+        }
+
+        ShopSign shop = ShopSign.from(sign);
+        if (shop == null) {
             String topLine = event.getLine(0);
             if (topLine != null && topLine.equalsIgnoreCase("[Shop]")) {
-                onShopSignCreate(event, sign);
+                if (event.getSide() == Side.FRONT) {
+                    onShopSignCreate(event, sign);
+                } else {
+                    LushContainerShops.getInstance().getConfigManager().sendMessage(event.getPlayer(), "wrong-side");
+                }
             }
 
             return;
         }
 
-        if (!event.getPlayer().getUniqueId().equals(shopSign.data().getOwner())) {
+        if (!shop.data().isOwner(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
             return;
         }
@@ -156,23 +163,23 @@ public class SignListener implements Listener {
             return;
         }
 
-        onShopSignEdit(event, shopSign);
+        onShopSignEdit(event, shop);
     }
 
     @EventHandler
     public void onSignBreak(@NotNull BlockBreakEvent event) {
-        ShopSign shopSign = ShopSign.from(event.getBlock());
-        if (shopSign == null) {
+        ShopSign shop = ShopSign.from(event.getBlock());
+        if (shop == null) {
             return;
         }
 
         Player player = event.getPlayer();
-        if (!player.getUniqueId().equals(shopSign.data().getOwner())) {
+        if (!shop.data().isOwner(player.getUniqueId())) {
             event.setCancelled(true);
             return;
         }
 
-        if (!LushContainerShops.getInstance().callEvent(new ShopSignBreakEvent(shopSign, player))) {
+        if (!LushContainerShops.getInstance().callEvent(new ShopSignBreakEvent(shop, player))) {
             event.setCancelled(true);
         }
     }

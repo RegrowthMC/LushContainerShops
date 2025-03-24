@@ -30,6 +30,11 @@ public class ShopData {
         return this.owner;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isOwner(@NotNull UUID uuid) {
+        return this.owner.equals(uuid);
+    }
+
     public @Nullable ShopItem getProduct() {
         return this.product;
     }
