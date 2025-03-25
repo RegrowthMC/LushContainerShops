@@ -19,8 +19,10 @@ display-visual: true
 connected-containers-only: true
 
 messages:
-  no-item: "&ff6969You must be holding an item to set the shop's product or cost"
-  wrong-side: "&ff6969Shops can only be created on the side that was facing you when you placed the sign"
+  bypassed-protection: "&#ffda54You have bypassed a locked shop container"
+  no-access: "&#ff6969This container is a locked shop container"
+  no-item: "&#ff6969You must be holding an item to set the shop's product or cost"
+  wrong-side: "&#ff6969Shops can only be created on the side that was facing you when you placed the sign"
   reload: "&#b7faa2LushContainerShops has been reloaded &#66b04f🔃"
   # Colour of the top line of sign shops
   header-color: "&#FFC56F"

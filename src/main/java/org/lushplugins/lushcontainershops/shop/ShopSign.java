@@ -3,12 +3,7 @@ package org.lushplugins.lushcontainershops.shop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.HangingSign;
-import org.bukkit.block.Sign;
-import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.*;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -16,33 +11,46 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.lushcontainershops.LushContainerShops;
-import org.lushplugins.lushcontainershops.persistence.ShopItemPersistentDataType;
-import org.lushplugins.lushcontainershops.persistence.UUIDPersistentDataType;
+import org.lushplugins.lushcontainershops.utils.SignUtils;
 import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
+import org.lushplugins.lushlib.utils.BlockPosition;
 
 import java.util.List;
+import java.util.UUID;
 
-/**
- * A basic wrapper for a shop sign containing the sign, and it's parsed shop data
- * @param sign the sign
- * @param data the shop's data
- */
-public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
+public class ShopSign extends ShopBlock {
 
     /**
-     * Returns {@code true} if both the product and cost have been defined
-     * @return whether the shop data is established
+     * A basic wrapper for a shop sign containing the sign, and it's parsed shop data
+     * @param sign the sign
+     * @param owner the shop's owner
+     * @param product the product
+     * @param cost the cost
+     * @param containerPosition the connected shop container's position
      */
-    public boolean isEstablished() {
-        return this.data.isEstablished();
+    public ShopSign(@NotNull Sign sign, @NotNull UUID owner, @Nullable ShopItem product, @Nullable ShopItem cost, @Nullable BlockPosition containerPosition) {
+        super(sign, owner, product, cost, containerPosition);
     }
 
-    private void updateLines(List<Component> lines) {
-        int lineCharLimit = this.sign instanceof HangingSign ? 10 : 15;
+    /**
+     * @param state the sign
+     * @param pdc The "shop" persistent data container, cannot be the full persistent data container
+     */
+    public ShopSign(Sign state, PersistentDataContainer pdc) {
+        super(state, pdc);
+    }
+
+    @Override
+    public @NotNull Sign getTileState() {
+        return (Sign) super.getTileState();
+    }
+
+    private void updateSignStateLines(List<Component> lines) {
+        int lineCharLimit = this.isHanging() ? 10 : 15;
 
         lines.set(0, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("header-color") + "[Shop]"));
 
-        ShopItem product = this.data.getProduct();
+        ShopItem product = this.getProduct();
         if (product != null) {
             lines.set(1, product.asTextComponent(lineCharLimit));
         } else {
@@ -52,7 +60,7 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
                 .decorate(TextDecoration.ITALIC));
         }
 
-        ShopItem cost = this.data.getCost();
+        ShopItem cost = this.getCost();
         if (cost != null) {
             lines.set(2, cost.asTextComponent(lineCharLimit));
         } else if (product != null) {
@@ -62,7 +70,7 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
                 .decorate(TextDecoration.ITALIC));
         }
 
-        if (!data.isEstablished()) {
+        if (!this.isEstablished()) {
             lines.set(3, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("not-setup")));
         } else {
             // TODO: Add other statuses
@@ -70,50 +78,53 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
         }
     }
 
-    private void updatePersistentDataContainer() {
-        PersistentDataContainer container = this.sign.getPersistentDataContainer();
-        LushContainerShops plugin = LushContainerShops.getInstance();
-
-        PersistentDataContainer shopContainer = container.getAdapterContext().newPersistentDataContainer();
-        shopContainer.set(plugin.namespacedKey("owner"), UUIDPersistentDataType.INSTANCE, this.data.getOwner());
-
-        ShopItem product = this.data.getProduct();
-        if (product != null) {
-            shopContainer.set(plugin.namespacedKey("product"), ShopItemPersistentDataType.INSTANCE, product);
-        }
-
-        ShopItem cost = this.data.getCost();
-        if (cost != null) {
-            shopContainer.set(plugin.namespacedKey("cost"), ShopItemPersistentDataType.INSTANCE, cost);
-        }
-
-        container.set(plugin.namespacedKey("shop"), PersistentDataType.TAG_CONTAINER, shopContainer);
-        this.sign.update();
+    public void updateSignState(List<Component> lines) {
+        updateSignStateLines(lines);
+        updateTileStatePDC();
     }
 
-    public void updateSign(List<Component> lines) {
-        updateLines(lines);
-        updatePersistentDataContainer();
+    public void updateSignState() {
+        Sign state = this.getTileState();
+        SignSide side = state.getSide(Side.FRONT);
+        updateSignState(side.lines());
+        state.update();
     }
 
-    public void updateSign() {
-        SignSide side = this.sign.getSide(Side.FRONT);
-        updateSign(side.lines());
-        this.sign.update();
+    public boolean isHanging() {
+        return this.getTileState() instanceof HangingSign;
     }
 
     public Block getAttachedTo() {
-        BlockFace attachedDirection;
-        if (this.sign instanceof HangingSign) {
-            attachedDirection = BlockFace.UP;
-        } else if (this.sign.getBlockData() instanceof WallSign signData) {
-            attachedDirection = signData.getFacing().getOppositeFace();
+        return SignUtils.getAttachedTo(this.getTileState());
+    }
+
+    @Override
+    public @Nullable Container findPotentialContainer() {
+        Block attachedTo = this.getAttachedTo();
+        Integer[][] relativePositions;
+        if (this.isHanging()) {
+            relativePositions = ShopSearchPath.HANGING_SIGN;
         } else {
-            attachedDirection = BlockFace.DOWN;
+            relativePositions = ShopSearchPath.SIGN;
         }
 
-        Location blockLocation = this.sign.getLocation().add(attachedDirection.getDirection());
-        return this.sign.getWorld().getBlockAt(blockLocation);
+        for (Integer[] relativePosition : relativePositions) {
+            Block relativeBlock = attachedTo.getRelative(
+                relativePosition[0],
+                relativePosition[1],
+                relativePosition[2]
+            );
+
+            if (!LushContainerShops.getInstance().getConfigManager().isWhitelistedContainer(relativeBlock.getType())) {
+                continue;
+            }
+
+            if ((relativeBlock.getWorld().getBlockState(relativeBlock.getLocation()) instanceof Container container)) {
+                return container;
+            }
+        }
+
+        return null;
     }
 
     public static @Nullable ShopSign from(Block block) {
@@ -129,13 +140,8 @@ public record ShopSign(@NotNull Sign sign, @NotNull ShopData data) {
     }
 
     public static @Nullable ShopSign from(Sign sign) {
-        PersistentDataContainer container = sign.getPersistentDataContainer();
-        PersistentDataContainer shopContainer = container.get(LushContainerShops.getInstance().namespacedKey("shop"), PersistentDataType.TAG_CONTAINER);
-        if (shopContainer == null) {
-            return null;
-        }
-
-        ShopData shopData = ShopData.from(shopContainer);
-        return new ShopSign(sign, shopData);
+        PersistentDataContainer pdc = sign.getPersistentDataContainer();
+        PersistentDataContainer shopPDC = pdc.get(LushContainerShops.getInstance().namespacedKey("shop"), PersistentDataType.TAG_CONTAINER);
+        return shopPDC != null ? new ShopSign(sign, shopPDC) : null;
     }
 }

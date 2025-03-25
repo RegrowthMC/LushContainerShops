@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.lushplugins.lushcontainershops.LushContainerShops;
-import org.lushplugins.lushcontainershops.shop.ShopData;
+import org.lushplugins.lushcontainershops.shop.ShopBlock;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.Equipment;
@@ -33,18 +33,17 @@ public class ContainerShopsCommand {
             return "Couldn't find shop sign";
         }
 
-        ShopSign sign = ShopSign.from(block);
-        if (sign == null) {
+        ShopSign shop = ShopSign.from(block);
+        if (shop == null) {
             return "Couldn't find shop sign";
         }
 
-        ShopData data = sign.data();
-        if (!data.isOwner(player.getUniqueId())) {
+        if (!shop.isOwner(player.getUniqueId())) {
             return "You are not the owner of this shop";
         }
 
-        data.setProduct(ShopItem.from(heldItem));
-        sign.updateSign();
+        shop.setProduct(ShopItem.from(heldItem));
+        shop.updateSignState();
         return "Successfully updated product!";
     }
 
@@ -55,18 +54,17 @@ public class ContainerShopsCommand {
             return "Couldn't find shop sign";
         }
 
-        ShopSign sign = ShopSign.from(block);
-        if (sign == null) {
+        ShopSign shop = ShopSign.from(block);
+        if (shop == null) {
             return "Couldn't find shop sign";
         }
 
-        ShopData data = sign.data();
-        if (!data.isOwner(player.getUniqueId())) {
+        if (!shop.isOwner(player.getUniqueId())) {
             return "You are not the owner of this shop";
         }
 
-        data.setCost(ShopItem.from(heldItem));
-        sign.updateSign();
+        shop.setCost(ShopItem.from(heldItem));
+        shop.updateSignState();
         return "Successfully updated cost!";
     }
 }
