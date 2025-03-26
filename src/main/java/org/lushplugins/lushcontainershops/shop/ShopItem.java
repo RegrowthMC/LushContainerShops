@@ -7,13 +7,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lushplugins.lushcontainershops.LushContainerShops;
+import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.utils.RegistryUtils;
+import org.lushplugins.lushcontainershops.utils.StringUtils;
 import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonAutoDetect;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonCreator;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonInclude;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonProperty;
-import org.lushplugins.lushlib.utils.StringUtils;
 
 import java.util.Arrays;
 
@@ -75,11 +77,12 @@ public class ShopItem {
             return this.displayName == null && this.customModelData == null;
         }
 
-        if (this.displayName != null && !itemMeta.getDisplayName().equals(this.displayName)) {
+        ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
+        if (configManager.shouldCompareDisplayNames() && this.displayName != null && !itemMeta.getDisplayName().equals(this.displayName)) {
             return false;
         }
 
-        if (this.customModelData != null && (!itemMeta.hasCustomModelData() || itemMeta.getCustomModelData() != this.customModelData)) {
+        if (configManager.shouldCompareCustomModelData() && this.customModelData != null && (!itemMeta.hasCustomModelData() || itemMeta.getCustomModelData() != this.customModelData)) {
             return false;
         }
 
@@ -126,7 +129,9 @@ public class ShopItem {
         Integer customModelData = null;
         ItemMeta itemMeta = item.getItemMeta();
         if (itemMeta != null) {
-            displayName = itemMeta.getDisplayName();
+            if (itemMeta.hasDisplayName()) {
+                displayName = itemMeta.getDisplayName();
+            }
 
             if (itemMeta.hasCustomModelData()) {
                 customModelData = itemMeta.getCustomModelData();

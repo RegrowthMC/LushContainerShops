@@ -20,6 +20,8 @@ public class ConfigManager {
     private List<Material> signWhitelist;
     private boolean displayVisual;
     private boolean connectedContainersOnly;
+    private boolean compareDisplayNames;
+    private boolean compareCustomModelData;
     private Map<String, String> messages;
 
     public ConfigManager() {
@@ -35,6 +37,8 @@ public class ConfigManager {
         this.signWhitelist = RegistryUtils.fromStringList(config.getStringList("sign-whitelist"), Registry.MATERIAL);
         this.displayVisual = config.getBoolean("display-visual", true);
         this.connectedContainersOnly = config.getBoolean("connected-containers-only", true);
+        this.compareDisplayNames = config.getBoolean("should-compare.display-names", true);
+        this.compareCustomModelData = config.getBoolean("should-compare.custom-model-data", true);
         this.messages = config.getConfigurationSection("messages").getValues(false).entrySet().stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey,
@@ -59,6 +63,14 @@ public class ConfigManager {
 
     public boolean shouldAllowConnectedContainersOnly() {
         return this.connectedContainersOnly;
+    }
+
+    public boolean shouldCompareDisplayNames() {
+        return this.compareDisplayNames;
+    }
+
+    public boolean shouldCompareCustomModelData() {
+        return this.compareCustomModelData;
     }
 
     public @Nullable String getMessage(@NotNull String key) {

@@ -18,12 +18,18 @@ display-visual: true
 # Note: Only the first container found will be classified as a shop)
 connected-containers-only: true
 
+# Whether the following attributes should be compared when comparing products and costs
+should-compare:
+  display-names: true
+  custom-model-data: true
+
 messages:
   updated-shop: "&#b7faa2Successfully updated your shop"
   not-shop: "&#ff6969You must be looking at a shop to run this command"
   cannot-edit: "&#ff6969You do not own this shop"
   bypassed-protection: "&#ffda54You have bypassed a locked shop container"
   no-access: "&#ff6969This container is a locked shop container"
+  no-container: "&#ff6969This shop is not connected to a container"
   no-item: "&#ff6969You must be holding an item to set the shop's product or cost"
   wrong-side: "&#ff6969Shops can only be created on the side that was facing you when you placed the sign"
   reload: "&#b7faa2LushContainerShops has been reloaded &#66b04f🔃"
