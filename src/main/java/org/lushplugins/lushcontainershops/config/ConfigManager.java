@@ -52,6 +52,7 @@ public class ConfigManager {
         return this.signWhitelist.contains(material);
     }
 
+    // TODO: Implement
     public boolean shouldDisplayVisual() {
         return this.displayVisual;
     }
