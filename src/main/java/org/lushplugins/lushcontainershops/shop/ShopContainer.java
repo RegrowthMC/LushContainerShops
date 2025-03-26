@@ -22,16 +22,21 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
         this.shops = new HashSet<>(shops);
     }
 
-    public boolean contains(ShopItem product) {
+    // TODO: Add some form of support for ShopItems with amounts greater than possible stack size
+    public @Nullable ItemStack findStackToTakeFrom(ShopItem product) {
         ItemStack[] contents = this.container.getInventory().getContents();
 
         for (ItemStack containerItem : contents) {
             if (containerItem != null && product.isValid(containerItem)) {
-                return true;
+                return containerItem;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    public boolean contains(ShopItem product) {
+        return findStackToTakeFrom(product) != null;
     }
 
     public boolean isOwner(UUID owner) {
