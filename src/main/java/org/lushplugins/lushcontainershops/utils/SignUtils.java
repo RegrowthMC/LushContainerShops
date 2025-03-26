@@ -9,6 +9,11 @@ import org.bukkit.block.data.type.WallSign;
 
 public class SignUtils {
 
+    public static String shortenStringForSign(String string, Sign sign) {
+        int lineCharLimit = sign instanceof HangingSign ? 10 : 15;
+        return StringUtils.shortenString(string, lineCharLimit);
+    }
+
     public static Block getAttachedTo(Sign sign) {
         BlockFace attachedDirection;
         if (sign instanceof HangingSign) {

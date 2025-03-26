@@ -45,6 +45,20 @@ public class SignListener implements Listener {
                 event.setCancelled(true);
             }
 
+            if (shop.getContainerPosition() == null) {
+                if (!shop.isOwner(player.getUniqueId())) {
+                    LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-container");
+                    return;
+                }
+
+                Container container = shop.findPotentialContainer();
+                if (container == null || !shop.linkContainer(container)) {
+                    LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-container");
+                }
+
+                return;
+            }
+
             if (!shop.isOwner(player.getUniqueId())) {
                 return;
             }

@@ -94,26 +94,7 @@ public class ShopItem {
     }
 
     public String asString(int lineCharLimit) {
-        StringBuilder builder = new StringBuilder()
-            .append(this.getAmount())
-            .append(' ');
-
-        int remainingSpace = lineCharLimit - builder.length();
-        if (remainingSpace > 0) {
-            String itemName = getItemName();
-
-            // builder.insert(0, "&#FF6969"); // TODO: Replace with item name's colour
-
-            if (itemName.length() > remainingSpace) {
-                builder
-                    .append(itemName, 0, remainingSpace - 1)
-                    .append("...");
-            } else {
-                builder.append(itemName);
-            }
-        }
-
-        return builder.toString();
+        return StringUtils.shortenString("%s %s".formatted(this.amount, this.getItemName()), lineCharLimit);
     }
 
     public Component asTextComponent() {

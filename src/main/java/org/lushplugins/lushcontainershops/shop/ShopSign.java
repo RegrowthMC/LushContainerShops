@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.utils.SignUtils;
+import org.lushplugins.lushcontainershops.utils.StringUtils;
 import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
 import org.lushplugins.lushlib.utils.BlockPosition;
 
@@ -56,7 +57,7 @@ public class ShopSign extends ShopBlock {
             lines.set(1, product.asTextComponent(lineCharLimit));
         } else {
             // TODO: Make line configurable?
-            lines.set(1, Component.text("click product")
+            lines.set(1, Component.text(StringUtils.shortenString("click product", lineCharLimit))
                 .color(NamedTextColor.LIGHT_PURPLE)
                 .decorate(TextDecoration.ITALIC));
         }
@@ -66,7 +67,7 @@ public class ShopSign extends ShopBlock {
             lines.set(2, cost.asTextComponent(lineCharLimit));
         } else if (product != null) {
             // TODO: Make line configurable?
-            lines.set(2, Component.text("click cost")
+            lines.set(2, Component.text(StringUtils.shortenString("click cost", lineCharLimit))
                 .color(NamedTextColor.LIGHT_PURPLE)
                 .decorate(TextDecoration.ITALIC));
         }
