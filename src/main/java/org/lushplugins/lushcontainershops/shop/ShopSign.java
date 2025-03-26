@@ -1,6 +1,7 @@
 package org.lushplugins.lushcontainershops.shop;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.block.*;
@@ -48,9 +49,10 @@ public class ShopSign extends ShopBlock {
     }
 
     private void updateSignStateLines(List<Component> lines) {
+        ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
         int lineCharLimit = this.isHanging() ? 10 : 15;
 
-        lines.set(0, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("header-color") + "[Shop]"));
+        lines.set(0, ModernChatColorHandler.translate(configManager.getMessageOrEmpty("header-color") + "[Shop]"));
 
         ShopItem product = this.getProduct();
         if (product != null) {
@@ -73,12 +75,24 @@ public class ShopSign extends ShopBlock {
         }
 
         ShopContainer shopContainer = this.getShopContainer();
+        String status;
         if (!this.isEstablished() || shopContainer == null) {
-            lines.set(3, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("not-setup")));
+            status = configManager.getMessageOrEmpty("not-setup");
         } else {
-            // TODO: Add other statuses ShopContainer#contains(ShopItem)
-            lines.set(3, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("in-stock")));
+            if (shopContainer.contains(this.getProduct())) {
+                status = configManager.getMessageOrEmpty("in-stock");
+            } else {
+                status = configManager.getMessageOrEmpty("out-of-stock");
+            }
         }
+
+        Component statusComponent = ModernChatColorHandler.translate(status);
+        if (statusComponent instanceof TextComponent statusTextComponent) {
+            String content = statusTextComponent.content();
+            statusComponent = statusTextComponent.content(StringUtils.shortenString(content, lineCharLimit));
+        }
+
+        lines.set(3, statusComponent);
     }
 
     public void updateSignState(List<Component> lines) {
