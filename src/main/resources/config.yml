@@ -36,6 +36,6 @@ messages:
   # Colour of the top line of sign shops
   header-color: "&#FFC56F"
   # Statuses for the bottom line of sign shops
-  in-stock: "&#BFF6A9In Stock" # TODO: Update
+  in-stock: "&#BFF6A9In Stock"
   out-of-stock: "&#FDE480Out of Stock"
   not-setup: "&cInvalid Shop"
