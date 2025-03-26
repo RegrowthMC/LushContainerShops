@@ -56,7 +56,7 @@ public class ConfigManager {
         return this.signWhitelist.contains(material);
     }
 
-    // TODO: Implement
+    // TODO: Implement as dropped item visuals
     public boolean shouldDisplayVisual() {
         return this.displayVisual;
     }
