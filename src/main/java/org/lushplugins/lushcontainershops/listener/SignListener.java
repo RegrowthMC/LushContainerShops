@@ -20,6 +20,7 @@ import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.api.event.ShopSignBreakEvent;
 import org.lushplugins.lushcontainershops.api.event.ShopSignCreateEvent;
 import org.lushplugins.lushcontainershops.api.event.ShopSignPrepareEvent;
+import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 
@@ -84,6 +85,24 @@ public class SignListener implements Listener {
             return;
         }
 
+        ShopContainer shopContainer = shop.getShopContainer();
+        if (shopContainer == null) {
+            LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-container");
+            return;
+        }
+
+        ItemStack heldItem = player.getInventory().getItemInMainHand();
+        if (!shop.isCost(heldItem)) {
+            return;
+        }
+
+        ItemStack productStack = shopContainer.findStackToTakeFrom(shop.getProduct());
+        if (productStack == null) {
+            shop.updateTileState();
+            return;
+        }
+
+        // TODO: Log transaction prior to purchase code
         // TODO: Implement purchasing
     }
 
@@ -95,7 +114,7 @@ public class SignListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        if (!shop.isOwner(player.getUniqueId()) || !shop.isEstablished()) {
+        if (!shop.isOwner(player.getUniqueId()) || !shop.isEstablished() || !player.isSneaking()) {
             event.setCancelled(true);
         }
     }
@@ -183,6 +202,7 @@ public class SignListener implements Listener {
             return;
         }
 
+        // TODO: Implement support for manually changing the product and cost on the sign
         onShopSignEdit(event, shop);
     }
 
