@@ -4,35 +4,86 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lushplugins.lushcontainershops.utils.RegistryUtils;
 import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
-import org.lushplugins.lushlib.utils.DisplayItemStack;
+import org.lushplugins.lushlib.libraries.jackson.annotation.JsonAutoDetect;
+import org.lushplugins.lushlib.libraries.jackson.annotation.JsonCreator;
+import org.lushplugins.lushlib.libraries.jackson.annotation.JsonInclude;
+import org.lushplugins.lushlib.libraries.jackson.annotation.JsonProperty;
 import org.lushplugins.lushlib.utils.StringUtils;
 
 import java.util.Arrays;
 
+@JsonAutoDetect(
+    isGetterVisibility = JsonAutoDetect.Visibility.NONE,
+    getterVisibility = JsonAutoDetect.Visibility.NONE,
+    fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShopItem {
-    private final DisplayItemStack item;
+    private final Material material;
+    private final int amount;
+    private final String displayName;
+    private final Integer customModelData;
 
-    public ShopItem(DisplayItemStack item) {
-        this.item = item;
-    }
+    @JsonCreator
+    public ShopItem(
+        @JsonProperty("material")
+        @NotNull Material material,
 
-    public DisplayItemStack getItem() {
-        return item;
+        @JsonProperty("amount")
+        int amount,
+
+        @JsonProperty("display_name")
+        @Nullable String displayName,
+
+        @JsonProperty("custom_model_data")
+        @Nullable Integer customModelData
+    ) {
+        this.material = material;
+        this.amount = amount;
+        this.displayName = displayName;
+        this.customModelData = customModelData;
     }
 
     public int getAmount() {
-        return item.getAmount().getMin();
+        return this.amount;
     }
 
     public String getItemName() {
-        if (item.hasDisplayName()) {
-            return item.getDisplayName();
+        if (this.displayName != null) {
+            return this.displayName;
         } else {
-            return StringUtils.makeFriendly(item.getType().key().value().replace("_", " "));
+            return StringUtils.makeFriendly(this.material.key().value().replace("_", " "));
         }
+    }
+
+    public boolean isValid(@NotNull ItemStack itemStack) {
+        if (this.material != itemStack.getType()) {
+            return false;
+        }
+
+        if (this.amount != itemStack.getAmount()) {
+            return false;
+        }
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return this.displayName == null && this.customModelData == null;
+        }
+
+        if (this.displayName != null && !itemMeta.getDisplayName().equals(this.displayName)) {
+            return false;
+        }
+
+        if (this.customModelData != null && (!itemMeta.hasCustomModelData() || itemMeta.getCustomModelData() != this.customModelData)) {
+            return false;
+        }
+
+        return true;
     }
 
     public String asString() {
@@ -71,12 +122,23 @@ public class ShopItem {
     }
 
     public static @NotNull ShopItem from(ItemStack item) {
-        return new ShopItem(DisplayItemStack.builder(item)
-            .setDisplayName(null)
-            .setLore(null)
-            .setEnchantGlow(null)
-            .setSkullTexture(null)
-            .build());
+        String displayName = null;
+        Integer customModelData = null;
+        ItemMeta itemMeta = item.getItemMeta();
+        if (itemMeta != null) {
+            displayName = itemMeta.getDisplayName();
+
+            if (itemMeta.hasCustomModelData()) {
+                customModelData = itemMeta.getCustomModelData();
+            }
+        }
+
+        return new ShopItem(
+            item.getType(),
+            item.getAmount(),
+            displayName,
+            customModelData
+        );
     }
 
     public static @NotNull ShopItem parseString(@NotNull String item) throws IllegalArgumentException {
@@ -97,9 +159,11 @@ public class ShopItem {
             throw new IllegalArgumentException();
         }
 
-        return new ShopItem(DisplayItemStack.builder()
-            .setType(material)
-            .setAmount(amount)
-            .build());
+        return new ShopItem(
+            material,
+            amount,
+            null,
+            null
+        );
     }
 }

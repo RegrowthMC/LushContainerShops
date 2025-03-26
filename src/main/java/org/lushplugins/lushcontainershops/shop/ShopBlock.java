@@ -99,7 +99,7 @@ public abstract class ShopBlock {
     }
 
     public boolean isProduct(ItemStack item) {
-        return this.product.getItem().isSimilar(item);
+        return this.product.isValid(item);
     }
 
     public void setProduct(ShopItem product) {
@@ -111,7 +111,7 @@ public abstract class ShopBlock {
     }
 
     public boolean isCost(ItemStack item) {
-        return this.cost.getItem().isSimilar(item);
+        return this.cost.isValid(item);
     }
 
     public void setCost(ShopItem cost) {
@@ -119,15 +119,19 @@ public abstract class ShopBlock {
     }
 
     /**
-     * Returns {@code true} if both the product and cost have been defined
+     * Returns {@code true} if both the product, cost and container position have been defined
      * @return whether the shop data is established
      */
     public boolean isEstablished() {
-        return this.product != null && this.cost != null;
+        return this.product != null && this.cost != null && this.containerPosition != null;
     }
 
     public @Nullable BlockPosition getContainerPosition() {
-        return containerPosition;
+        return this.containerPosition;
+    }
+
+    public @Nullable ShopContainer getShopContainer() {
+        return this.containerPosition != null ? ShopContainer.from(this.containerPosition.getBlock()) : null;
     }
 
     public abstract @Nullable Container findPotentialContainer();

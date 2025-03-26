@@ -24,7 +24,7 @@ public class ShopItemPersistentDataType implements PersistentDataType<String, Sh
     @Override
     public @NotNull String toPrimitive(@NotNull ShopItem complex, @NotNull PersistentDataAdapterContext context) {
         try {
-            return LushContainerShops.getJacksonMapper().writeValueAsString(complex.getItem());
+            return LushContainerShops.getJacksonMapper().writeValueAsString(complex);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -33,7 +33,7 @@ public class ShopItemPersistentDataType implements PersistentDataType<String, Sh
     @Override
     public @NotNull ShopItem fromPrimitive(@NotNull String primitive, @NotNull PersistentDataAdapterContext context) {
         try {
-            return new ShopItem(LushContainerShops.getJacksonMapper().readValue(primitive, DisplayItemStack.class));
+            return LushContainerShops.getJacksonMapper().readValue(primitive, ShopItem.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

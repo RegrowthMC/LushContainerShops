@@ -71,10 +71,11 @@ public class ShopSign extends ShopBlock {
                 .decorate(TextDecoration.ITALIC));
         }
 
-        if (!this.isEstablished()) {
+        ShopContainer shopContainer = this.getShopContainer();
+        if (!this.isEstablished() || shopContainer == null) {
             lines.set(3, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("not-setup")));
         } else {
-            // TODO: Add other statuses
+            // TODO: Add other statuses ShopContainer#contains(ShopItem)
             lines.set(3, ModernChatColorHandler.translate(LushContainerShops.getInstance().getConfigManager().getMessageOrEmpty("in-stock")));
         }
     }
