@@ -11,6 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.lushcontainershops.LushContainerShops;
+import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.utils.SignUtils;
 import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
 import org.lushplugins.lushlib.utils.BlockPosition;
@@ -100,7 +101,19 @@ public class ShopSign extends ShopBlock {
 
     @Override
     public @Nullable Container findPotentialContainer() {
+        ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
+
         Block attachedTo = this.getAttachedTo();
+        if (configManager.shouldAllowConnectedContainersOnly()) {
+            if (!configManager.isWhitelistedContainer(attachedTo.getType())) {
+                return null;
+            }
+
+            if ((attachedTo.getWorld().getBlockState(attachedTo.getLocation()) instanceof Container container)) {
+                return container;
+            }
+        }
+
         Integer[][] relativePositions;
         if (this.isHanging()) {
             relativePositions = ShopSearchPath.HANGING_SIGN;
@@ -115,7 +128,7 @@ public class ShopSign extends ShopBlock {
                 relativePosition[2]
             );
 
-            if (!LushContainerShops.getInstance().getConfigManager().isWhitelistedContainer(relativeBlock.getType())) {
+            if (!configManager.isWhitelistedContainer(relativeBlock.getType())) {
                 continue;
             }
 

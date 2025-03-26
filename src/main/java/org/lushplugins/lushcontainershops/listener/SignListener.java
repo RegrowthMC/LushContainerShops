@@ -20,7 +20,6 @@ import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.api.event.ShopSignBreakEvent;
 import org.lushplugins.lushcontainershops.api.event.ShopSignCreateEvent;
 import org.lushplugins.lushcontainershops.api.event.ShopSignPrepareEvent;
-import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 

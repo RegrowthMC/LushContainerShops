@@ -42,10 +42,12 @@ public class ConfigManager {
             ));
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isWhitelistedContainer(Material material) {
         return this.containerWhitelist.contains(material);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isWhitelistedSign(Material material) {
         return this.signWhitelist.contains(material);
     }
