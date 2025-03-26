@@ -56,7 +56,7 @@ public class ContainerListener implements Listener {
         }
 
         for (ShopSign shop : shopContainer.getShopSigns()) {
-            shop.unlinkContainer(shopContainer.container());
+            shop.unlinkContainer(shopContainer);
         }
     }
 

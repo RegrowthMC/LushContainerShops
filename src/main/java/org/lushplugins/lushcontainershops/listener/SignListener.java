@@ -72,14 +72,14 @@ public class SignListener implements Listener {
             if (shop.getProduct() == null) {
                 shop.setProduct(ShopItem.from(heldItem));
                 LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.ADD_PRODUCT));
-                shop.updateSignState();
+                shop.updateTileState();
                 LushContainerShops.getInstance().getConfigManager().sendMessage(player, "updated-shop");
                 return;
             }
 
             shop.setCost(ShopItem.from(heldItem));
             LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.ADD_COST));
-            shop.updateSignState();
+            shop.updateTileState();
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "updated-shop");
             return;
         }

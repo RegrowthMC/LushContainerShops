@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.lushplugins.lushcontainershops.LushContainerShops;
-import org.lushplugins.lushcontainershops.shop.ShopBlock;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.Equipment;
@@ -43,7 +42,7 @@ public class ContainerShopsCommand {
         }
 
         shop.setProduct(ShopItem.from(heldItem));
-        shop.updateSignState();
+        shop.updateTileState();
         return LushContainerShops.getInstance().getConfigManager().getMessage("updated-shop");
     }
 
@@ -64,7 +63,7 @@ public class ContainerShopsCommand {
         }
 
         shop.setCost(ShopItem.from(heldItem));
-        shop.updateSignState();
+        shop.updateTileState();
         return LushContainerShops.getInstance().getConfigManager().getMessage("updated-shop");
     }
 }

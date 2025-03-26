@@ -100,7 +100,8 @@ public class ShopSign extends ShopBlock {
         updateTileStatePDC();
     }
 
-    public void updateSignState() {
+    @Override
+    public void updateTileState() {
         Sign state = this.getTileState();
         SignSide side = state.getSide(Side.FRONT);
         updateSignState(side.lines());

@@ -79,10 +79,16 @@ public abstract class ShopBlock {
 
         if (this.containerPosition != null) {
             shopPDC.set(plugin.namespacedKey("container_pos"), Vector3iPersistentDataType.INSTANCE, this.containerPosition.asVector());
+        } else {
+            shopPDC.remove(plugin.namespacedKey("container_pos"));
         }
 
         pdc.set(plugin.namespacedKey("shop"), PersistentDataType.TAG_CONTAINER, shopPDC);
         this.state.update();
+    }
+
+    public void updateTileState() {
+        updateTileStatePDC();
     }
 
     public @NotNull UUID getOwner() {
@@ -152,7 +158,7 @@ public abstract class ShopBlock {
         }
 
         this.containerPosition = BlockPosition.from(container);
-        this.updateTileStatePDC();
+        this.updateTileState();
         return true;
     }
 
@@ -169,17 +175,10 @@ public abstract class ShopBlock {
         unlinkContainer(shopContainer);
     }
 
-    public void unlinkContainer(Container container) {
-        ShopContainer shopContainer = ShopContainer.from(container);
-        if (shopContainer == null) {
-            return;
-        }
-
-        unlinkContainer(shopContainer);
-    }
-
     public void unlinkContainer(ShopContainer shopContainer) {
         shopContainer.removeShop(BlockPosition.from(this.getTileState()).asVector());
-        shopContainer.updateContainerStatePDC();
+
+        this.containerPosition = null;
+        updateTileState();
     }
 }
