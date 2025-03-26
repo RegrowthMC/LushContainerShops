@@ -30,41 +30,41 @@ public class ContainerShopsCommand {
     public String setProduct(BukkitCommandActor actor, @RayTrace Block block, @Equipment(EquipmentSlot.HAND) ItemStack heldItem) {
         Player player = actor.requirePlayer();
         if (block == null) {
-            return "Couldn't find shop sign";
+            return LushContainerShops.getInstance().getConfigManager().getMessage("not-shop");
         }
 
         ShopSign shop = ShopSign.from(block);
         if (shop == null) {
-            return "Couldn't find shop sign";
+            return LushContainerShops.getInstance().getConfigManager().getMessage("not-shop");
         }
 
         if (!shop.isOwner(player.getUniqueId())) {
-            return "You are not the owner of this shop";
+            return LushContainerShops.getInstance().getConfigManager().getMessage("cannot-edit");
         }
 
         shop.setProduct(ShopItem.from(heldItem));
         shop.updateSignState();
-        return "Successfully updated product!";
+        return LushContainerShops.getInstance().getConfigManager().getMessage("updated-shop");
     }
 
     @Subcommand("setcost")
     public String setCost(BukkitCommandActor actor, @RayTrace Block block, @Equipment(EquipmentSlot.HAND) ItemStack heldItem) {
         Player player = actor.requirePlayer();
         if (block == null) {
-            return "Couldn't find shop sign";
+            return LushContainerShops.getInstance().getConfigManager().getMessage("not-shop");
         }
 
         ShopSign shop = ShopSign.from(block);
         if (shop == null) {
-            return "Couldn't find shop sign";
+            return LushContainerShops.getInstance().getConfigManager().getMessage("not-shop");
         }
 
         if (!shop.isOwner(player.getUniqueId())) {
-            return "You are not the owner of this shop";
+            return LushContainerShops.getInstance().getConfigManager().getMessage("cannot-edit");
         }
 
         shop.setCost(ShopItem.from(heldItem));
         shop.updateSignState();
-        return "Successfully updated cost!";
+        return LushContainerShops.getInstance().getConfigManager().getMessage("updated-shop");
     }
 }
