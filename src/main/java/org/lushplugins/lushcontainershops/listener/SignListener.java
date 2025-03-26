@@ -54,12 +54,12 @@ public class SignListener implements Listener {
                 Container container = shop.findPotentialContainer();
                 if (container == null || !shop.linkContainer(container)) {
                     LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-container");
+                    return;
                 }
-
-                return;
             }
 
             if (!shop.isOwner(player.getUniqueId())) {
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "not-setup");
                 return;
             }
 

@@ -77,12 +77,12 @@ public class ShopSign extends ShopBlock {
         ShopContainer shopContainer = this.getShopContainer();
         String status;
         if (!this.isEstablished() || shopContainer == null) {
-            status = configManager.getMessageOrEmpty("not-setup");
+            status = configManager.getMessageOrEmpty("not-setup-status");
         } else {
             if (shopContainer.contains(this.getProduct())) {
-                status = configManager.getMessageOrEmpty("in-stock");
+                status = configManager.getMessageOrEmpty("in-stock-status");
             } else {
-                status = configManager.getMessageOrEmpty("out-of-stock");
+                status = configManager.getMessageOrEmpty("out-of-stock-status");
             }
         }
 
