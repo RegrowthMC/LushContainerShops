@@ -45,7 +45,8 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
 
     public List<ShopSign> getShopSigns() {
         World world = this.container.getWorld();
-        return this.shops.stream()
+        List<Vector3i> inactiveShops = new ArrayList<>();
+        List<ShopSign> shopSigns = this.shops.stream()
             .map(position -> {
                 Block block = world.getBlockAt(
                     position.x(),
@@ -54,13 +55,17 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
 
                 ShopSign shop = ShopSign.from(block);
                 if (shop == null) {
-                    this.shops.remove(position);
+                    inactiveShops.add(position);
                 }
 
                 return shop;
             })
             .filter(Objects::nonNull)
             .toList();
+
+        this.shops.removeAll(inactiveShops);
+
+        return shopSigns;
     }
 
     public void updateContainerStatePDC() {
