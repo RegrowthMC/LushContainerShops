@@ -130,10 +130,6 @@ public abstract class ShopBlock {
         return containerPosition;
     }
 
-    public void setContainerPosition(BlockPosition containerPosition) {
-        this.containerPosition = containerPosition;
-    }
-
     public abstract @Nullable Container findPotentialContainer();
 
     public boolean linkContainer(Container container) {
@@ -151,21 +147,35 @@ public abstract class ShopBlock {
             newShopContainer.updateContainerStatePDC();
         }
 
-        this.setContainerPosition(BlockPosition.from(container));
+        this.containerPosition = BlockPosition.from(container);
         this.updateTileStatePDC();
         return true;
     }
 
-    public void unlinkContainer(Container container) {
-        PersistentDataContainer pdc = container.getPersistentDataContainer();
+    public void unlinkContainer() {
+        if (this.containerPosition == null) {
+            return;
+        }
 
+        ShopContainer shopContainer = ShopContainer.from(this.containerPosition.getBlock());
+        if (shopContainer == null) {
+            return;
+        }
+
+        unlinkContainer(shopContainer);
+    }
+
+    public void unlinkContainer(Container container) {
         ShopContainer shopContainer = ShopContainer.from(container);
         if (shopContainer == null) {
             return;
         }
 
+        unlinkContainer(shopContainer);
+    }
+
+    public void unlinkContainer(ShopContainer shopContainer) {
         shopContainer.removeShop(BlockPosition.from(this.getTileState()).asVector());
         shopContainer.updateContainerStatePDC();
-        pdc.remove(LushContainerShops.getInstance().namespacedKey("shop_container"));
     }
 }

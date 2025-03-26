@@ -1,5 +1,6 @@
 package org.lushplugins.lushcontainershops.listener;
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
@@ -8,6 +9,7 @@ import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -18,6 +20,7 @@ import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.api.event.ShopSignBreakEvent;
 import org.lushplugins.lushcontainershops.api.event.ShopSignCreateEvent;
 import org.lushplugins.lushcontainershops.api.event.ShopSignPrepareEvent;
+import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 
@@ -39,7 +42,9 @@ public class SignListener implements Listener {
 
         Player player = event.getPlayer();
         if (!shop.isEstablished()) {
-            event.setCancelled(true);
+            if (!event.getAction().isLeftClick()) {
+                event.setCancelled(true);
+            }
 
             if (!shop.isOwner(player.getUniqueId())) {
                 return;
@@ -166,7 +171,7 @@ public class SignListener implements Listener {
         onShopSignEdit(event, shop);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSignBreak(@NotNull BlockBreakEvent event) {
         ShopSign shop = ShopSign.from(event.getBlock());
         if (shop == null) {
@@ -180,6 +185,16 @@ public class SignListener implements Listener {
         }
 
         if (!LushContainerShops.getInstance().callEvent(new ShopSignBreakEvent(shop, player))) {
+            event.setCancelled(true);
+        }
+
+        shop.unlinkContainer();
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onContainerDestroy(BlockDestroyEvent event) {
+        ShopSign shop = ShopSign.from(event.getBlock());
+        if (shop != null) {
             event.setCancelled(true);
         }
     }
