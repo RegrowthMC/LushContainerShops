@@ -82,6 +82,10 @@ public class InventoryUtils {
         return prepareToTake(findSimilar(inventory, item), item);
     }
 
+    public static boolean contains(Inventory inventory, ShopItem item) {
+        return prepareToTake(inventory, item) != null;
+    }
+
     public static @NotNull Map<Integer, ItemStack> findSimilar(Inventory inventory, ShopItem item) {
         Map<Integer, ItemStack> similarItems = new HashMap<>();
 

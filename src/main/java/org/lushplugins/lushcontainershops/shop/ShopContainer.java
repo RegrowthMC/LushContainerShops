@@ -23,7 +23,7 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
     }
 
     public boolean contains(ShopItem product) {
-        return InventoryUtils.containsSimilar(this.container.getInventory(), product);
+        return InventoryUtils.contains(this.container.getInventory(), product);
     }
 
     public boolean isOwner(UUID owner) {
