@@ -131,9 +131,6 @@ public class SignListener implements Listener {
             return;
         }
 
-        LushContainerShops.getInstance().log(Level.INFO, "Processing %s's purchase of %s (product) for %s (cost)"
-            .formatted(player.getName(), shopProduct.asString(), shopCost.asString()));
-
         // Ensure that both the player and the container have enough empty slots for the transaction
         List<ItemStack> products = productSnapshot.first();
         int requiredPlayerSlots = products.size();
@@ -152,6 +149,9 @@ public class SignListener implements Listener {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "not-enough-player-slots");
             return;
         }
+
+        LushContainerShops.getInstance().log(Level.INFO, "Processing %s's purchase of %s (product) for %s (cost)"
+            .formatted(player.getName(), shopProduct.asString(), shopCost.asString()));
 
         // Take products from container and costs from the player
         productSnapshot.second().forEach(shopInventory::setItem);
