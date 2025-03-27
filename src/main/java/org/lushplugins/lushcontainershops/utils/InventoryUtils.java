@@ -49,10 +49,6 @@ public class InventoryUtils {
 
         int remainingToTake = item.getAmount();
         for (Map.Entry<Integer, ItemStack> entry : inventoryContents.entrySet()) {
-            if (remainingToTake <= 0) {
-                break;
-            }
-
             int slot = entry.getKey();
             ItemStack itemStack = entry.getValue();
             int stackSize = itemStack.getAmount();
@@ -61,17 +57,22 @@ public class InventoryUtils {
                 takenItems.add(itemStack.clone());
                 slotsToUpdate.put(slot, null);
                 remainingToTake -= stackSize;
-                continue;
+            } else {
+                ItemStack inventoryItem = itemStack.clone();
+                inventoryItem.setAmount(stackSize - remainingToTake);
+
+                ItemStack takenItem = itemStack.clone();
+                takenItem.setAmount(remainingToTake);
+
+                takenItems.add(takenItem);
+                slotsToUpdate.put(slot, inventoryItem);
+
+                return new Pair<>(takenItems, slotsToUpdate);
             }
 
-            itemStack.setAmount(stackSize - remainingToTake);
-
-            ItemStack takenItem = itemStack.clone();
-            takenItem.setAmount(remainingToTake);
-
-            takenItems.add(takenItem);
-
-            return new Pair<>(takenItems, slotsToUpdate);
+            if (remainingToTake <= 0) {
+                return new Pair<>(takenItems, slotsToUpdate);
+            }
         }
 
         return null;

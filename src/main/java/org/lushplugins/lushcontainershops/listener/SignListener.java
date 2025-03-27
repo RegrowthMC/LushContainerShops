@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class SignListener implements Listener {
 
@@ -111,7 +112,7 @@ public class SignListener implements Listener {
         Inventory shopInventory = shopContainer.container().getInventory();
         Pair<List<ItemStack>, Map<Integer, ItemStack>> productSnapshot = InventoryUtils.prepareToTake(shopInventory, shopProduct);
         if (productSnapshot == null) {
-            // TODO: Error message
+            LushContainerShops.getInstance().getConfigManager().sendMessage(player, "missing-products");
             shop.updateTileState();
             return;
         }
@@ -119,12 +120,14 @@ public class SignListener implements Listener {
         Inventory playerInventory = player.getInventory();
         Pair<List<ItemStack>, Map<Integer, ItemStack>> costSnapshot = InventoryUtils.prepareToTake(playerInventory, shopCost);
         if (costSnapshot == null) {
-            // TODO: Error message
+            LushContainerShops.getInstance().getConfigManager().sendMessage(player, "missing-costs", (s) -> s.replace("%cost%", shopCost.asString()));
             shop.updateTileState();
             return;
         }
 
         // TODO: Log transaction prior to handling purchase
+        LushContainerShops.getInstance().log(Level.INFO, "Processing %s's purchase of %s (product) for %s (cost)"
+            .formatted(player.getName(), shopProduct.asString(), shopCost.asString()));
 
         // Ensure that both the player and the container have enough empty slots for the transaction
         List<ItemStack> products = productSnapshot.first();
@@ -135,17 +138,17 @@ public class SignListener implements Listener {
         int requiredShopSlots = costs.size();
         int emptyPlayerSlots = InventoryUtils.countEmptySlots(playerInventory) + costs.size();
 
-        if (requiredPlayerSlots > emptyPlayerSlots) {
-            // TODO: Error message
-            return;
-        }
-
         if (requiredShopSlots > emptyShopSlots) {
-            // TODO: Error message
+            LushContainerShops.getInstance().getConfigManager().sendMessage(player, "not-enough-container-slots");
             return;
         }
 
-        // Take products from container and then costs from the player
+        if (requiredPlayerSlots > emptyPlayerSlots) {
+            LushContainerShops.getInstance().getConfigManager().sendMessage(player, "not-enough-player-slots");
+            return;
+        }
+
+        // Take products from container and costs from the player
         productSnapshot.second().forEach(shopInventory::setItem);
         costSnapshot.second().forEach(playerInventory::setItem);
 
