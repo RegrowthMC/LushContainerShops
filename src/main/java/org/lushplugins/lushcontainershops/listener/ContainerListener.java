@@ -16,7 +16,6 @@ import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 
-// TODO: Ensure that hoppers and similar cannot pull from shop containers
 public class ContainerListener implements Listener {
 
     @EventHandler
