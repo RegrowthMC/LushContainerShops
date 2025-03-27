@@ -3,7 +3,6 @@ package org.lushplugins.lushcontainershops.shop;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
@@ -21,19 +20,6 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
         this.container = container;
         this.owner = owner;
         this.shops = new HashSet<>(shops);
-    }
-
-    // TODO: Add some form of support for ShopItems with amounts greater than possible stack size
-    public @Nullable ItemStack findStackToTakeFrom(ShopItem product) {
-        ItemStack[] contents = this.container.getInventory().getContents();
-
-        for (ItemStack containerItem : contents) {
-            if (containerItem != null && product.isValid(containerItem)) {
-                return containerItem;
-            }
-        }
-
-        return null;
     }
 
     public boolean contains(ShopItem product) {
