@@ -17,6 +17,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -69,14 +70,13 @@ public class PacketEventsHook extends Hook implements org.bukkit.event.Listener 
                 }
 
                 Block shopContainerBlock = shopContainerPosition.getBlock();
-                int heightOffset = 1;
-                while (!canDisplayVisual(shopContainerBlock, heightOffset) && heightOffset < 5) {
-                    heightOffset++;
+                if (!canDisplayVisualAt(shopContainerBlock.getRelative(BlockFace.UP))) {
+                    continue;
                 }
 
                 Location location = new Location(
                     shopContainerPosition.x() + 0.5,
-                    shopContainerPosition.y() + heightOffset,
+                    shopContainerPosition.y() + 1.0,
                     shopContainerPosition.z() + 0.5,
                     0,
                     0
@@ -159,8 +159,8 @@ public class PacketEventsHook extends Hook implements org.bukkit.event.Listener 
         }
     }
 
-    private static boolean canDisplayVisual(Block origin, int yOffset) {
-        Material material = origin.getRelative(0, yOffset, 0).getType();
+    private static boolean canDisplayVisualAt(Block block) {
+        Material material = block.getType();
         return material.isAir() || Tag.IMPERMEABLE.isTagged(material);
     }
 

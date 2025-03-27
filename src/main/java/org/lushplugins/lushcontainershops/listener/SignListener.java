@@ -89,6 +89,11 @@ public class SignListener implements Listener {
             shop.setCost(ShopItem.from(heldItem));
             LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST));
             shop.updateTileState();
+
+            LushContainerShops.getInstance().getPacketEventsHook().ifPresent(hook -> {
+                hook.reloadVisualsInChunk(block.getChunk());
+            });
+
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "updated-shop");
             return;
         }
