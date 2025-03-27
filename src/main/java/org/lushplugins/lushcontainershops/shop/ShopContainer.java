@@ -11,6 +11,7 @@ import org.joml.Vector3i;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.persistence.UUIDPersistentDataType;
 import org.lushplugins.lushcontainershops.persistence.Vector3iPersistentDataType;
+import org.lushplugins.lushcontainershops.utils.InventoryUtils;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
     }
 
     public boolean contains(ShopItem product) {
-        return findStackToTakeFrom(product) != null;
+        return InventoryUtils.containsSimilar(this.container.getInventory(), product);
     }
 
     public boolean isOwner(UUID owner) {

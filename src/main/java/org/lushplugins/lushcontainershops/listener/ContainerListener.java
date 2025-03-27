@@ -9,13 +9,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.lushplugins.lushcontainershops.LushContainerShops;
-import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.shop.ShopContainer;
-import org.lushplugins.lushcontainershops.shop.ShopSearchPath;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
 
+// TODO: Ensure that hoppers and similar cannot pull from shop containers
 public class ContainerListener implements Listener {
 
     @EventHandler
@@ -39,6 +39,24 @@ public class ContainerListener implements Listener {
                 event.setCancelled(true);
                 LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-access");
             }
+        }
+    }
+
+    @EventHandler
+    public void onContainerClose(InventoryCloseEvent event) {
+        Location location = event.getInventory().getLocation();
+        if (location == null) {
+            return;
+        }
+
+        Block block = location.getBlock();
+        ShopContainer shopContainer = ShopContainer.from(block);
+        if (shopContainer == null) {
+            return;
+        }
+
+        for (ShopSign shop : shopContainer.getShopSigns()) {
+            shop.updateTileState();
         }
     }
 

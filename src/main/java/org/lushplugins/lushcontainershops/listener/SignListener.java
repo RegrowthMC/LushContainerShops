@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.lushplugins.lushcontainershops.LushContainerShops;
@@ -23,7 +24,12 @@ import org.lushplugins.lushcontainershops.api.event.ShopSignPrepareEvent;
 import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
+import org.lushplugins.lushcontainershops.utils.InventoryUtils;
+import org.lushplugins.lushlib.utils.Pair;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class SignListener implements Listener {
@@ -41,6 +47,7 @@ public class SignListener implements Listener {
         }
 
         Player player = event.getPlayer();
+        // Handle shop creation if it is not established
         if (!shop.isEstablished()) {
             if (!event.getAction().isLeftClick()) {
                 event.setCancelled(true);
@@ -65,7 +72,7 @@ public class SignListener implements Listener {
             }
 
             ItemStack heldItem = player.getInventory().getItemInMainHand();
-            if (heldItem.getType().isAir()) {
+            if (heldItem.isEmpty()) {
                 LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-item");
                 return;
             }
@@ -85,25 +92,68 @@ public class SignListener implements Listener {
             return;
         }
 
+        // Handle purchasing from shop
         ShopContainer shopContainer = shop.getShopContainer();
         if (shopContainer == null) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-container");
             return;
         }
 
-        ItemStack heldItem = player.getInventory().getItemInMainHand();
-        if (!shop.isCost(heldItem)) {
+        // Ensure that owners cannot purchase from their own shop
+        if (shop.isOwner(player.getUniqueId())) {
             return;
         }
 
-        ItemStack productStack = shopContainer.findStackToTakeFrom(shop.getProduct());
-        if (productStack == null) {
+        ShopItem shopProduct = Objects.requireNonNull(shop.getProduct());
+        ShopItem shopCost = Objects.requireNonNull(shop.getCost());
+
+        // Collect the similar products and costs from their respective inventories
+        Inventory shopInventory = shopContainer.container().getInventory();
+        Pair<List<ItemStack>, Map<Integer, ItemStack>> productSnapshot = InventoryUtils.prepareToTake(shopInventory, shopProduct);
+        if (productSnapshot == null) {
+            // TODO: Error message
             shop.updateTileState();
             return;
         }
 
-        // TODO: Log transaction prior to purchase code
-        // TODO: Implement purchasing
+        Inventory playerInventory = player.getInventory();
+        Pair<List<ItemStack>, Map<Integer, ItemStack>> costSnapshot = InventoryUtils.prepareToTake(playerInventory, shopCost);
+        if (costSnapshot == null) {
+            // TODO: Error message
+            shop.updateTileState();
+            return;
+        }
+
+        // TODO: Log transaction prior to handling purchase
+
+        // Ensure that both the player and the container have enough empty slots for the transaction
+        List<ItemStack> products = productSnapshot.first();
+        int requiredPlayerSlots = products.size();
+        int emptyShopSlots = InventoryUtils.countEmptySlots(shopInventory) + products.size();
+
+        List<ItemStack> costs = costSnapshot.first();
+        int requiredShopSlots = costs.size();
+        int emptyPlayerSlots = InventoryUtils.countEmptySlots(playerInventory) + costs.size();
+
+        if (requiredPlayerSlots > emptyPlayerSlots) {
+            // TODO: Error message
+            return;
+        }
+
+        if (requiredShopSlots > emptyShopSlots) {
+            // TODO: Error message
+            return;
+        }
+
+        // Take products from container and then costs from the player
+        productSnapshot.second().forEach(shopInventory::setItem);
+        costSnapshot.second().forEach(playerInventory::setItem);
+
+        // Give products to player and place costs in container
+        InventoryUtils.addOrDropItems(playerInventory, products.toArray(ItemStack[]::new));
+        InventoryUtils.addOrDropItems(shopInventory, costs.toArray(ItemStack[]::new));
+
+        shop.updateTileState();
     }
 
     @EventHandler

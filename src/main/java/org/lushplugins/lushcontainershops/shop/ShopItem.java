@@ -63,12 +63,8 @@ public class ShopItem {
         }
     }
 
-    public boolean isValid(@NotNull ItemStack itemStack) {
+    public boolean isSimilar(@NotNull ItemStack itemStack) {
         if (this.material != itemStack.getType()) {
-            return false;
-        }
-
-        if (this.amount != itemStack.getAmount()) {
             return false;
         }
 
@@ -83,6 +79,18 @@ public class ShopItem {
         }
 
         if (configManager.shouldCompareCustomModelData() && this.customModelData != null && (!itemMeta.hasCustomModelData() || itemMeta.getCustomModelData() != this.customModelData)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean isValid(@NotNull ItemStack itemStack) {
+        if (!isSimilar(itemStack)) {
+            return false;
+        }
+
+        if (this.amount != itemStack.getAmount()) {
             return false;
         }
 
@@ -140,9 +148,13 @@ public class ShopItem {
             amount = 1;
         }
 
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount values must be 1 or more");
+        }
+
         Material material = RegistryUtils.parseString(String.join("_", materialData), Registry.MATERIAL);
         if (material == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("'%s' is not a valid material".formatted(String.join(" ", materialData)));
         }
 
         return new ShopItem(
