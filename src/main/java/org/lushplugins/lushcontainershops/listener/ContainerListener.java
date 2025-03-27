@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.HopperInventorySearchEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.lushplugins.lushcontainershops.LushContainerShops;
@@ -83,6 +84,18 @@ public class ContainerListener implements Listener {
         ShopContainer shopContainer = ShopContainer.from(event.getBlock());
         if (shopContainer != null) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onHopperSearch(HopperInventorySearchEvent event) {
+        if (event.getContainerType() != HopperInventorySearchEvent.ContainerType.SOURCE) {
+            return;
+        }
+
+        ShopContainer shopContainer = ShopContainer.from(event.getSearchBlock());
+        if (shopContainer != null) {
+            event.setInventory(null);
         }
     }
 }
