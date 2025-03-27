@@ -125,7 +125,6 @@ public class SignListener implements Listener {
             return;
         }
 
-        // TODO: Log transaction prior to handling purchase
         LushContainerShops.getInstance().log(Level.INFO, "Processing %s's purchase of %s (product) for %s (cost)"
             .formatted(player.getName(), shopProduct.asString(), shopCost.asString()));
 
