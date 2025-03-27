@@ -52,7 +52,7 @@ public class ShopSign extends ShopBlock {
         ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
         int lineCharLimit = this.isHanging() ? 10 : 15;
 
-        lines.set(0, ModernChatColorHandler.translate(configManager.getMessageOrEmpty("header-color") + "[Shop]"));
+        lines.set(0, ModernChatColorHandler.translate(configManager.getMessageOrEmpty("header-color") + configManager.getMessage("header")));
 
         ShopItem product = this.getProduct();
         if (product != null) {

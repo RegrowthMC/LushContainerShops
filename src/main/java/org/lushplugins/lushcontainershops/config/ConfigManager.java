@@ -77,12 +77,12 @@ public class ConfigManager {
         return this.messages.get(key);
     }
 
-    public @NotNull String getMessageOrDefault(@NotNull String key, @NotNull String def) {
+    public @NotNull String getMessage(@NotNull String key, @NotNull String def) {
         return this.messages.getOrDefault(key, def);
     }
 
     public @NotNull String getMessageOrEmpty(@NotNull String key) {
-        return getMessageOrDefault(key, "");
+        return getMessage(key, "");
     }
 
     public void sendMessage(@NotNull CommandSender recipient, @NotNull String key, @Nullable Function<String, String> parser) {

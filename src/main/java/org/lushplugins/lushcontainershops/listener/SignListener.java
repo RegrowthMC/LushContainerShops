@@ -234,7 +234,7 @@ public class SignListener implements Listener {
         ShopSign shop = ShopSign.from(sign);
         if (shop == null) {
             String topLine = event.getLine(0);
-            if (topLine != null && topLine.equalsIgnoreCase("[Shop]")) {
+            if (topLine != null && topLine.equalsIgnoreCase(LushContainerShops.getInstance().getConfigManager().getMessage("header", "[Shop]"))) {
                 if (event.getSide() == Side.FRONT) {
                     onShopSignCreate(event, sign);
                 } else {
