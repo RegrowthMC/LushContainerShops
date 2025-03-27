@@ -81,20 +81,14 @@ public class ContainerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onContainerDestroy(BlockDestroyEvent event) {
-        ShopContainer shopContainer = ShopContainer.from(event.getBlock());
-        if (shopContainer != null) {
+        if (ShopContainer.isShopContainer(event.getBlock())) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onHopperSearch(HopperInventorySearchEvent event) {
-        if (event.getContainerType() != HopperInventorySearchEvent.ContainerType.SOURCE) {
-            return;
-        }
-
-        ShopContainer shopContainer = ShopContainer.from(event.getSearchBlock());
-        if (shopContainer != null) {
+        if (ShopContainer.isShopContainer(event.getBlock())) {
             event.setInventory(null);
         }
     }

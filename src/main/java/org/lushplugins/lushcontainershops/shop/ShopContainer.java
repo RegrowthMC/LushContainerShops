@@ -124,4 +124,20 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
 
         return new ShopContainer(container, owner, new HashSet<>(shops));
     }
+
+    public static boolean isShopContainer(Block block) {
+        if (!LushContainerShops.getInstance().getConfigManager().isWhitelistedContainer(block.getType())) {
+            return false;
+        }
+
+        if (!(block.getWorld().getBlockState(block.getLocation()) instanceof Container container)) {
+            return false;
+        }
+
+        return ShopContainer.isShopContainer(container);
+    }
+
+    public static boolean isShopContainer(Container container) {
+        return container.getPersistentDataContainer().has(LushContainerShops.getInstance().namespacedKey("shop_container"));
+    }
 }
