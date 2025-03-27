@@ -51,6 +51,10 @@ public class ShopItem {
         this.customModelData = customModelData;
     }
 
+    public @NotNull Material getMaterial() {
+        return this.material;
+    }
+
     public int getAmount() {
         return this.amount;
     }

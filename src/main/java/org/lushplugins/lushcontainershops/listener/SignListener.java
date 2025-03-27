@@ -87,7 +87,7 @@ public class SignListener implements Listener {
             }
 
             shop.setCost(ShopItem.from(heldItem));
-            LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.ADD_COST));
+            LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST));
             shop.updateTileState();
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "updated-shop");
             return;
@@ -205,7 +205,7 @@ public class SignListener implements Listener {
         if (product != null && cost != null) {
             shopSignEvent = new ShopSignCreateEvent(shop);
         } else {
-            shopSignEvent = new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST);
+            shopSignEvent = new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.PREPARE);
         }
 
         if (!LushContainerShops.getInstance().callEvent(shopSignEvent)) {
@@ -214,6 +214,10 @@ public class SignListener implements Listener {
         }
 
         shop.updateSignState(event.lines());
+
+        LushContainerShops.getInstance().getPacketEventsHook().ifPresent(hook -> {
+            hook.reloadVisualsInChunk(sign.getChunk());
+        });
     }
 
     private void onShopSignEdit(SignChangeEvent event, ShopSign shop) {
@@ -240,6 +244,10 @@ public class SignListener implements Listener {
         }
 
         shop.updateSignState(event.lines());
+
+        LushContainerShops.getInstance().getPacketEventsHook().ifPresent(hook -> {
+            hook.reloadVisualsInChunk(event.getBlock().getChunk());
+        });
     }
 
     @EventHandler
@@ -282,7 +290,8 @@ public class SignListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSignBreak(@NotNull BlockBreakEvent event) {
-        ShopSign shop = ShopSign.from(event.getBlock());
+        Block block = event.getBlock();
+        ShopSign shop = ShopSign.from(block);
         if (shop == null) {
             return;
         }
@@ -298,6 +307,10 @@ public class SignListener implements Listener {
         }
 
         shop.unlinkContainer();
+
+        LushContainerShops.getInstance().getPacketEventsHook().ifPresent(hook -> {
+            hook.reloadVisualsInChunk(block.getChunk());
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

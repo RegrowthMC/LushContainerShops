@@ -9,8 +9,8 @@ sign-whitelist:
   - "#signs"
   - "#all_hanging_signs"
 
-# If enabled, sign shops will display a packet based item visual above the shop
-# Note: This visual will appear below hanging sign shops
+# If enabled, sign shops will display a packet based item visual
+# Note: This setting will not work without PacketEvents installed on the server
 display-visual: true
 
 # If enabled, only containers directly connected to a sign can be classified as a shop

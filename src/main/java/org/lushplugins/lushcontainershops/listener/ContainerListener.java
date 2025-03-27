@@ -87,7 +87,7 @@ public class ContainerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHopperSearch(HopperInventorySearchEvent event) {
-        if (ShopContainer.isShopContainer(event.getBlock())) {
+        if (ShopContainer.isShopContainer(event.getSearchBlock())) {
             event.setInventory(null);
         }
     }

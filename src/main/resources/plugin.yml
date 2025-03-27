@@ -2,3 +2,6 @@ name: LushContainerShops
 version: ${project.version}
 main: org.lushplugins.lushcontainershops.LushContainerShops
 api-version: '1.17'
+load: STARTUP
+softdepend:
+  - packetevents

@@ -14,6 +14,8 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
     maven("https://repo.papermc.io/repository/maven-public/") // Paper
     maven("https://repo.lushplugins.org/snapshots/") // LushLib
+    maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
+    maven("https://maven.evokegames.gg/snapshots") // EntityLib
 }
 
 dependencies {
@@ -21,11 +23,13 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
 
     // Soft Dependencies
+    compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
 
     // Libraries
     implementation("org.lushplugins:LushLib:0.10.59")
     implementation("io.github.revxrsal:lamp.common:4.0.0-rc.9")
     implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.9")
+    implementation("me.tofaa.entitylib:spigot:+e181b97-SNAPSHOT")
 }
 
 java {
@@ -66,6 +70,10 @@ tasks {
 
     runServer {
         minecraftVersion("1.21.1")
+
+        downloadPlugins {
+            modrinth("packetevents", "2.7.0")
+        }
     }
 }
 
