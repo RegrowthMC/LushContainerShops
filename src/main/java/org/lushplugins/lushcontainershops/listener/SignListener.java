@@ -102,6 +102,7 @@ public class SignListener implements Listener {
 
         // Ensure that owners cannot purchase from their own shop
         if (shop.isOwner(player.getUniqueId())) {
+            shop.updateTileState();
             return;
         }
 
