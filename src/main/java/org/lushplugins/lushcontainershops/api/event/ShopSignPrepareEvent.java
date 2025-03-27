@@ -40,8 +40,8 @@ public class ShopSignPrepareEvent extends ShopSignEvent implements Cancellable {
     }
 
     public enum Step {
-        PLACE,
-        ADD_PRODUCT,
+        SET_COST,
+        SET_PRODUCT,
         ADD_COST
     }
 }

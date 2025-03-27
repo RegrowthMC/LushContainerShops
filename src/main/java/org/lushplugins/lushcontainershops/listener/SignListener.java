@@ -80,7 +80,7 @@ public class SignListener implements Listener {
 
             if (shop.getProduct() == null) {
                 shop.setProduct(ShopItem.from(heldItem));
-                LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.ADD_PRODUCT));
+                LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_PRODUCT));
                 shop.updateTileState();
                 LushContainerShops.getInstance().getConfigManager().sendMessage(player, "updated-shop");
                 return;
@@ -205,7 +205,7 @@ public class SignListener implements Listener {
         if (product != null && cost != null) {
             shopSignEvent = new ShopSignCreateEvent(shop);
         } else {
-            shopSignEvent = new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.PLACE);
+            shopSignEvent = new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST);
         }
 
         if (!LushContainerShops.getInstance().callEvent(shopSignEvent)) {
@@ -216,8 +216,30 @@ public class SignListener implements Listener {
         shop.updateSignState(event.lines());
     }
 
-    private void onShopSignEdit(SignChangeEvent event, ShopSign shopSign) {
-        shopSign.updateSignState(event.lines());
+    private void onShopSignEdit(SignChangeEvent event, ShopSign shop) {
+        String rawProduct = event.getLine(1);
+        if (rawProduct != null) {
+            try {
+                ShopItem product = ShopItem.parseString(rawProduct);
+                if (LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_PRODUCT))) {
+                    shop.setProduct(product);
+                }
+
+                shop.setProduct(ShopItem.parseString(rawProduct));
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        String rawCost = event.getLine(2);
+        if (rawCost != null) {
+            try {
+                ShopItem cost = ShopItem.parseString(rawCost);
+                if (LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST))) {
+                    shop.setCost(cost);
+                }
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        shop.updateSignState(event.lines());
     }
 
     @EventHandler
@@ -255,7 +277,6 @@ public class SignListener implements Listener {
             return;
         }
 
-        // TODO: Implement support for manually changing the product and cost on the sign
         onShopSignEdit(event, shop);
     }
 
