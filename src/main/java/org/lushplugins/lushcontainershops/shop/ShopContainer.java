@@ -10,7 +10,9 @@ import org.joml.Vector3i;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.persistence.UUIDPersistentDataType;
 import org.lushplugins.lushcontainershops.persistence.Vector3iPersistentDataType;
+import org.lushplugins.lushcontainershops.utils.BlockUtils;
 import org.lushplugins.lushcontainershops.utils.InventoryUtils;
+import org.lushplugins.lushlib.utils.BlockPosition;
 
 import java.util.*;
 
@@ -24,6 +26,10 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
 
     public boolean contains(ShopItem product) {
         return InventoryUtils.contains(this.container.getInventory(), product);
+    }
+
+    public BlockPosition getPosition() {
+        return BlockPosition.from(container);
     }
 
     public boolean isOwner(UUID owner) {
@@ -104,7 +110,18 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
             return null;
         }
 
-        return ShopContainer.from(container);
+        ShopContainer shopContainer = ShopContainer.from(container);
+        if (shopContainer != null) {
+            return shopContainer;
+        }
+
+        // Handle double chests
+        Block connected = BlockUtils.getConnectedChest(block);
+        if (connected != null && connected.getState() instanceof Container connectedContainer) {
+            return ShopContainer.from(connectedContainer);
+        } else {
+            return null;
+        }
     }
 
     public static @Nullable ShopContainer from(Container container) {
@@ -130,11 +147,21 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
             return false;
         }
 
-        if (!(block.getWorld().getBlockState(block.getLocation()) instanceof Container container)) {
+        if (!(block.getState() instanceof Container container)) {
             return false;
         }
 
-        return ShopContainer.isShopContainer(container);
+        if (ShopContainer.isShopContainer(container)) {
+            return true;
+        }
+
+        // Handle double chests
+        Block connected = BlockUtils.getConnectedChest(block);
+        if (connected != null && connected.getState() instanceof Container connectedContainer) {
+            return ShopContainer.isShopContainer(connectedContainer);
+        } else {
+            return false;
+        }
     }
 
     public static boolean isShopContainer(Container container) {

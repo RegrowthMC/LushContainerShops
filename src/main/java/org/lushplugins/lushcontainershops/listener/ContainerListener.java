@@ -9,12 +9,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.HopperInventorySearchEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
+import org.lushplugins.lushcontainershops.utils.BlockUtils;
+import org.lushplugins.lushlib.utils.BlockPosition;
 
 public class ContainerListener implements Listener {
 
@@ -60,6 +63,38 @@ public class ContainerListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onContainerPlace(BlockPlaceEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Block block = event.getBlock();
+        if (!LushContainerShops.getInstance().getConfigManager().isWhitelistedContainer(block.getType())) {
+            return;
+        }
+
+        Block connected = BlockUtils.getConnectedChest(block);
+        if (connected == null) {
+            return;
+        }
+
+        ShopContainer shopContainer = ShopContainer.from(connected);
+        if (shopContainer == null) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        if (!shopContainer.isOwner(player.getUniqueId())) {
+            if (player.hasPermission("lushcontainershops.bypass")) {
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "bypassed-protection");
+            } else {
+                event.setCancelled(true);
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-access");
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onContainerBreak(BlockBreakEvent event) {
         ShopContainer shopContainer = ShopContainer.from(event.getBlock());
@@ -69,12 +104,19 @@ public class ContainerListener implements Listener {
 
         Player player = event.getPlayer();
         if (!shopContainer.isOwner(player.getUniqueId())) {
-            event.setCancelled(true);
-            return;
+            if (player.hasPermission("lushcontainershops.bypass")) {
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "bypassed-protection");
+            } else {
+                event.setCancelled(true);
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "no-access");
+                return;
+            }
         }
 
-        for (ShopSign shop : shopContainer.getShopSigns()) {
-            shop.unlinkContainer(shopContainer);
+        if (BlockPosition.from(event.getBlock()).equals(shopContainer.getPosition())) {
+            for (ShopSign shop : shopContainer.getShopSigns()) {
+                shop.unlinkContainer(shopContainer);
+            }
         }
     }
 
