@@ -37,6 +37,10 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignInteract(PlayerInteractEvent event) {
+        if (event.useInteractedBlock() == Event.Result.DENY) {
+            return;
+        }
+
         Block block = event.getClickedBlock();
         if (block == null) {
             return;
@@ -160,6 +164,10 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignOpen(PlayerOpenSignEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
         ShopSign shop = ShopSign.from(event.getSign());
         if (shop == null) {
             return;
@@ -251,6 +259,10 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignEdit(SignChangeEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
         Block block = event.getBlock();
         if (!LushContainerShops.getInstance().getConfigManager().isWhitelistedSign(block.getType())) {
             return;
@@ -289,6 +301,10 @@ public class SignListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSignBreak(@NotNull BlockBreakEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
         Block block = event.getBlock();
         ShopSign shop = ShopSign.from(block);
         if (shop == null) {
