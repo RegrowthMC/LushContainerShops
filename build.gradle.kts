@@ -72,7 +72,6 @@ tasks {
         minecraftVersion("1.21.1")
 
         downloadPlugins {
-            github("rutgerkok", "BlockLocker", "v1.13", "BlockLocker.jar")
             modrinth("packetevents", "2.7.0")
         }
     }
