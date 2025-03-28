@@ -43,6 +43,11 @@ public class ContainerShopsCommand {
 
         shop.setProduct(ShopItem.from(heldItem));
         shop.updateTileState();
+
+        LushContainerShops.getInstance().getPacketEventsHook().ifPresent(hook -> {
+            hook.reloadVisualsInChunk(block.getChunk());
+        });
+
         return LushContainerShops.getInstance().getConfigManager().getMessage("updated-shop");
     }
 
@@ -64,6 +69,11 @@ public class ContainerShopsCommand {
 
         shop.setCost(ShopItem.from(heldItem));
         shop.updateTileState();
+
+        LushContainerShops.getInstance().getPacketEventsHook().ifPresent(hook -> {
+            hook.reloadVisualsInChunk(block.getChunk());
+        });
+
         return LushContainerShops.getInstance().getConfigManager().getMessage("updated-shop");
     }
 }
