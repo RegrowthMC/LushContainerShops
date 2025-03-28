@@ -105,12 +105,6 @@ public class SignListener implements Listener {
             return;
         }
 
-        // Ensure that owners cannot purchase from their own shop
-        if (shop.isOwner(player.getUniqueId())) {
-            shop.updateTileState();
-            return;
-        }
-
         ShopItem shopProduct = Objects.requireNonNull(shop.getProduct());
         ShopItem shopCost = Objects.requireNonNull(shop.getCost());
 
@@ -127,7 +121,6 @@ public class SignListener implements Listener {
         Pair<List<ItemStack>, Map<Integer, ItemStack>> costSnapshot = InventoryUtils.prepareToTake(playerInventory, shopCost);
         if (costSnapshot == null) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "missing-costs", (s) -> s.replace("%cost%", shopCost.asString()));
-            shop.updateTileState();
             return;
         }
 
@@ -142,6 +135,7 @@ public class SignListener implements Listener {
 
         if (requiredShopSlots > emptyShopSlots) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "not-enough-container-slots");
+            shop.updateTileState();
             return;
         }
 
