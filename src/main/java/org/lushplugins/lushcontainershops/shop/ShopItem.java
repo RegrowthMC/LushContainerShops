@@ -67,6 +67,10 @@ public class ShopItem {
         }
     }
 
+    public Integer getCustomModelData() {
+        return this.customModelData;
+    }
+
     public boolean isSimilar(@NotNull ItemStack itemStack) {
         if (this.material != itemStack.getType()) {
             return false;

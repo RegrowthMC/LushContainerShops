@@ -1,8 +1,12 @@
 package org.lushplugins.lushcontainershops.hook;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPotionContents;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemProfile;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.potion.Potions;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.google.common.collect.HashMultimap;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
@@ -31,6 +35,7 @@ import org.lushplugins.lushlib.hook.Hook;
 import org.lushplugins.lushlib.utils.BlockPosition;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 public class PacketEventsHook extends Hook implements org.bukkit.event.Listener {
@@ -85,10 +90,34 @@ public class PacketEventsHook extends Hook implements org.bukkit.event.Listener 
                 WrapperEntity item = new WrapperEntity(EntityTypes.ITEM);
                 ItemEntityMeta entityMeta = item.getEntityMeta(ItemEntityMeta.class);
                 entityMeta.setHasNoGravity(true);
-                entityMeta.setItem(ItemStack.builder()
+
+                ItemStack.Builder itemBuilder = ItemStack.builder()
                     .type(SpigotConversionUtil.fromBukkitItemMaterial(product.getMaterial()))
-                    .amount(product.getAmount())
-                    .build());
+                    .amount(product.getAmount());
+
+                Integer customModelData = product.getCustomModelData();
+                if (product.getCustomModelData() != null) {
+                    itemBuilder.component(ComponentTypes.CUSTOM_MODEL_DATA, customModelData);
+                }
+
+                switch (product.getMaterial()) {
+                    case PLAYER_HEAD -> itemBuilder.component(ComponentTypes.PROFILE, new ItemProfile(
+                        null,
+                        null,
+                        Collections.singletonList(new ItemProfile.Property(
+                            "textures",
+                            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDM0ZTA2M2NhZmI0NjdhNWM4ZGU0M2VjNzg2MTkzOTlmMzY5ZjRhNTI0MzRkYTgwMTdhOTgzY2RkOTI1MTZhMCJ9fX0=",
+                            null
+                        ))
+                    ));
+                    case POTION, SPLASH_POTION, LINGERING_POTION -> itemBuilder.component(ComponentTypes.POTION_CONTENTS, new ItemPotionContents(
+                        Potions.AWKWARD,
+                        14821887,
+                        Collections.emptyList()
+                    ));
+                }
+
+                entityMeta.setItem(itemBuilder.build());
 
                 item.spawn(location);
                 for (Player player : chunk.getPlayersSeeingChunk()) {
