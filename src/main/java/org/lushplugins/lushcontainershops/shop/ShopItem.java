@@ -1,6 +1,7 @@
 package org.lushplugins.lushcontainershops.shop;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
 import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +12,8 @@ import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.utils.RegistryUtils;
 import org.lushplugins.lushcontainershops.utils.StringUtils;
+import org.lushplugins.lushcontainershops.utils.component.LimitedFlattener;
+import org.lushplugins.lushlib.libraries.chatcolor.ChatColorHandler;
 import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonAutoDetect;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonCreator;
@@ -61,9 +64,9 @@ public class ShopItem {
 
     public String getItemName() {
         if (this.displayName != null) {
-            return this.displayName;
+            return ChatColorHandler.translate(this.displayName);
         } else {
-            return StringUtils.makeFriendly(this.material.key().value().replace("_", " "));
+            return ChatColorHandler.translate(StringUtils.makeFriendly(this.material.key().value().replace("_", " ")));
         }
     }
 
@@ -106,11 +109,11 @@ public class ShopItem {
     }
 
     public String asString() {
-        return asString(15);
+        return "%s %s".formatted(this.amount, this.getItemName());
     }
 
     public String asString(int lineCharLimit) {
-        return StringUtils.shortenString("%s %s".formatted(this.amount, this.getItemName()), lineCharLimit);
+        return StringUtils.shortenString(asString(), lineCharLimit);
     }
 
     public Component asTextComponent() {
@@ -118,7 +121,11 @@ public class ShopItem {
     }
 
     public Component asTextComponent(int lineCharLimit) {
-        return ModernChatColorHandler.translate(this.asString(lineCharLimit));
+        Component component = ModernChatColorHandler.translate(this.asString());
+
+        LimitedFlattener flattern = new LimitedFlattener(lineCharLimit);
+        ComponentFlattener.basic().flatten(component, flattern);
+        return flattern.getResult();
     }
 
     public static @NotNull ShopItem from(ItemStack item) {
