@@ -21,6 +21,7 @@ import org.lushplugins.lushlib.libraries.jackson.annotation.JsonInclude;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 @JsonAutoDetect(
     isGetterVisibility = JsonAutoDetect.Visibility.NONE,
@@ -85,12 +86,17 @@ public class ShopItem {
         }
 
         ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
-        if (configManager.shouldCompareDisplayNames() && this.displayName != null && !itemMeta.getDisplayName().equals(this.displayName)) {
-            return false;
+        if (configManager.shouldCompareDisplayNames()) {
+            if (!Objects.equals(this.displayName, itemMeta.getDisplayName())) {
+                return false;
+            }
         }
 
-        if (configManager.shouldCompareCustomModelData() && this.customModelData != null && (!itemMeta.hasCustomModelData() || itemMeta.getCustomModelData() != this.customModelData)) {
-            return false;
+        if (configManager.shouldCompareCustomModelData()) {
+            Integer customModelData = itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : null;
+            if (!Objects.equals(this.customModelData, customModelData)) {
+                return false;
+            }
         }
 
         return true;
