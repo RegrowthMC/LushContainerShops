@@ -313,8 +313,12 @@ public class SignListener implements Listener {
 
         Player player = event.getPlayer();
         if (!shop.isOwner(player.getUniqueId())) {
-            event.setCancelled(true);
-            return;
+            if (player.hasPermission("lushcontainershops.bypass")) {
+                LushContainerShops.getInstance().getConfigManager().sendMessage(player, "bypassed-protection");
+            } else {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         if (!LushContainerShops.getInstance().callEvent(new ShopSignBreakEvent(shop, player))) {

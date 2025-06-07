@@ -87,7 +87,8 @@ public class ShopItem {
 
         ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
         if (configManager.shouldCompareDisplayNames()) {
-            if (!Objects.equals(this.displayName, itemMeta.getDisplayName())) {
+            String displayName = itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : null;
+            if (!Objects.equals(this.displayName, displayName)) {
                 return false;
             }
         }
