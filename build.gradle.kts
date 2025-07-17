@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // Dependencies
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
 
     // Soft Dependencies
     compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
