@@ -23,7 +23,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
 
     // Soft Dependencies
-    compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.9.3")
 
     // Libraries
     implementation("org.lushplugins:LushLib:0.10.59")
