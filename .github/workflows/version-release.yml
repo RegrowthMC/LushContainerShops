@@ -72,7 +72,7 @@ jobs:
           overwrite: false
 
       - name: Post Modrinth Release
-        if: env.MODRINTH_TOKEN != ''
+        if: false
         run: |
           chmod +x ./gradlew
           ./gradlew modrinth
