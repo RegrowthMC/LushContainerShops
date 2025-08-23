@@ -69,10 +69,10 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.1")
+        minecraftVersion("1.21.7")
 
         downloadPlugins {
-            modrinth("packetevents", "2.7.0")
+            modrinth("packetevents", "2.9.4+spigot")
         }
     }
 }
