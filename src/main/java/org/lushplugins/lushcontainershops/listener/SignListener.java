@@ -24,11 +24,10 @@ import org.lushplugins.lushcontainershops.api.event.ShopSignPrepareEvent;
 import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
+import org.lushplugins.lushcontainershops.utils.InventoryChangeSnapshot;
 import org.lushplugins.lushcontainershops.utils.InventoryUtils;
-import org.lushplugins.lushlib.utils.Pair;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -114,7 +113,7 @@ public class SignListener implements Listener {
 
         // Collect the similar products and costs from their respective inventories
         Inventory shopInventory = shopContainer.container().getInventory();
-        Pair<List<ItemStack>, Map<Integer, ItemStack>> productSnapshot = InventoryUtils.prepareToTake(shopInventory, shopProduct);
+        InventoryChangeSnapshot productSnapshot = InventoryUtils.prepareToTake(shopInventory, shopProduct);
         if (productSnapshot == null) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "missing-products");
             shop.updateTileState();
@@ -122,20 +121,20 @@ public class SignListener implements Listener {
         }
 
         Inventory playerInventory = player.getInventory();
-        Pair<List<ItemStack>, Map<Integer, ItemStack>> costSnapshot = InventoryUtils.prepareToTake(playerInventory, shopCost);
+        InventoryChangeSnapshot costSnapshot = InventoryUtils.prepareToTake(playerInventory, shopCost);
         if (costSnapshot == null) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "missing-costs", (s) -> s.replace("%cost%", shopCost.asString()));
             return;
         }
 
         // Ensure that both the player and the container have enough empty slots for the transaction
-        List<ItemStack> products = productSnapshot.first();
+        List<ItemStack> products = productSnapshot.getRemovedItems();
         int requiredPlayerSlots = products.size();
-        int emptyShopSlots = InventoryUtils.countEmptySlots(shopInventory) + products.size();
+        int emptyShopSlots = InventoryUtils.countEmptySlots(shopInventory) + productSnapshot.countEmptiedSlots();
 
-        List<ItemStack> costs = costSnapshot.first();
+        List<ItemStack> costs = costSnapshot.getRemovedItems();
         int requiredShopSlots = costs.size();
-        int emptyPlayerSlots = InventoryUtils.countEmptySlots(playerInventory) + costs.size();
+        int emptyPlayerSlots = InventoryUtils.countEmptySlots(playerInventory) + costSnapshot.countEmptiedSlots();
 
         if (requiredShopSlots > emptyShopSlots) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(player, "not-enough-container-slots");
@@ -152,8 +151,8 @@ public class SignListener implements Listener {
             .formatted(player.getName(), shopProduct.asString(), shopCost.asString()));
 
         // Take products from container and costs from the player
-        productSnapshot.second().forEach(shopInventory::setItem);
-        costSnapshot.second().forEach(playerInventory::setItem);
+        productSnapshot.applyTo(shopInventory);
+        costSnapshot.applyTo(playerInventory);
 
         // Give products to player and place costs in container
         InventoryUtils.addOrDropItems(playerInventory, products.toArray(ItemStack[]::new));
