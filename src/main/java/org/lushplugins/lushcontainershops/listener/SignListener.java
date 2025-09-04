@@ -108,6 +108,10 @@ public class SignListener implements Listener {
             return;
         }
 
+        if (shop.isOwner(player.getUniqueId()) && player.isSneaking()) {
+            return;
+        }
+
         ShopItem shopProduct = Objects.requireNonNull(shop.getProduct());
         ShopItem shopCost = Objects.requireNonNull(shop.getCost());
 
