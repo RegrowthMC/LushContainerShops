@@ -27,8 +27,8 @@ dependencies {
 
     // Libraries
     implementation("org.lushplugins:LushLib:0.10.59")
-    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.9")
-    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.9")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.14")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.14")
     implementation("me.tofaa.entitylib:spigot:+e181b97-SNAPSHOT")
 }
 
