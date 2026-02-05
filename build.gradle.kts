@@ -26,7 +26,7 @@ dependencies {
     compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
 
     // Libraries
-    implementation("org.lushplugins:LushLib:0.10.59")
+    implementation("org.lushplugins:LushLib:0.10.84")
     implementation("io.github.revxrsal:lamp.common:4.0.0-rc.9")
     implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.9")
     implementation("io.github.tofaa2:spigot:3.1.0-SNAPSHOT")
