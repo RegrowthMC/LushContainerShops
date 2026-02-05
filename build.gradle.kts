@@ -15,7 +15,7 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/") // Paper
     maven("https://repo.lushplugins.org/snapshots/") // LushLib
     maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
-    maven("https://maven.evokegames.gg/snapshots") // EntityLib
+    maven("https://maven.pvphub.me/tofaa") // EntityLib
 }
 
 dependencies {
