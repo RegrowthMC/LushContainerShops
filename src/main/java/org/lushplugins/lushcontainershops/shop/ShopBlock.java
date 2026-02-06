@@ -14,6 +14,7 @@ import org.lushplugins.lushcontainershops.persistence.UUIDPersistentDataType;
 import org.lushplugins.lushcontainershops.persistence.Vector3iPersistentDataType;
 import org.lushplugins.lushlib.utils.BlockPosition;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -153,7 +154,7 @@ public abstract class ShopBlock {
             shopContainer.addShop(shopPosition);
         } else {
             Vector3i shopPosition = BlockPosition.from(this.getTileState()).asVector();
-            ShopContainer newShopContainer = new ShopContainer(container, this.getOwner(), Collections.singleton(shopPosition));
+            ShopContainer newShopContainer = new ShopContainer(container, this.getOwner(), new ArrayList<>(), Collections.singleton(shopPosition));
             newShopContainer.updateContainerStatePDC();
         }
 

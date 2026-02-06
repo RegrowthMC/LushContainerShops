@@ -1,10 +1,12 @@
 package org.lushplugins.lushcontainershops.shop;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3i;
 import org.lushplugins.lushcontainershops.LushContainerShops;
@@ -16,11 +18,12 @@ import org.lushplugins.lushlib.utils.BlockPosition;
 
 import java.util.*;
 
-public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops) {
+public record ShopContainer(Container container, UUID owner, List<UUID> stockers, Set<Vector3i> shops) {
 
-    public ShopContainer(Container container, UUID owner, Set<Vector3i> shops) {
+    public ShopContainer(Container container, UUID owner, List<UUID> stockers, Set<Vector3i> shops) {
         this.container = container;
         this.owner = owner;
+        this.stockers = stockers;
         this.shops = new HashSet<>(shops);
     }
 
@@ -34,6 +37,22 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
 
     public boolean isOwner(UUID owner) {
         return this.owner.equals(owner);
+    }
+
+    public boolean isStocker(@NotNull UUID uuid) {
+        return this.stockers.contains(uuid);
+    }
+
+    public List<UUID> getStockers() {
+        return this.stockers;
+    }
+
+    public void addStocker(@NotNull UUID uuid) {
+        this.stockers.add(uuid);
+    }
+
+    public void removeStocker(@NotNull UUID uuid) {
+        this.stockers.remove(uuid);
     }
 
     public void addShop(Vector3i shopPosition) {
@@ -91,6 +110,7 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
 
         PersistentDataContainer shopContainerPDC = pdc.getAdapterContext().newPersistentDataContainer();
         shopContainerPDC.set(plugin.namespacedKey("owner"), UUIDPersistentDataType.INSTANCE, this.owner);
+        shopContainerPDC.set(plugin.namespacedKey("stockers"), PersistentDataType.LIST.listTypeFrom(UUIDPersistentDataType.INSTANCE), this.getStockers());
         shopContainerPDC.set(
             plugin.namespacedKey("shops"),
             PersistentDataType.LIST.listTypeFrom(Vector3iPersistentDataType.INSTANCE),
@@ -134,12 +154,19 @@ public record ShopContainer(Container container, UUID owner, Set<Vector3i> shops
         }
 
         UUID owner = shopContainerPDC.get(plugin.namespacedKey("owner"), UUIDPersistentDataType.INSTANCE);
+        NamespacedKey stockersKey = plugin.namespacedKey("stockers");
+        List<UUID> stockers;
+        if (shopContainerPDC.has(stockersKey)) {
+            stockers = new ArrayList<>(shopContainerPDC.get(stockersKey, PersistentDataType.LIST.listTypeFrom(UUIDPersistentDataType.INSTANCE)));
+        } else {
+            stockers = new ArrayList<>();
+        }
         List<Vector3i> shops = shopContainerPDC.get(
             plugin.namespacedKey("shops"),
              PersistentDataType.LIST.listTypeFrom(Vector3iPersistentDataType.INSTANCE)
         );
 
-        return new ShopContainer(container, owner, new HashSet<>(shops));
+        return new ShopContainer(container, owner, stockers, new HashSet<>(shops));
     }
 
     public static boolean isShopContainer(Block block) {

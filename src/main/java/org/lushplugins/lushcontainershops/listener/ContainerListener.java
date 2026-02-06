@@ -19,6 +19,8 @@ import org.lushplugins.lushcontainershops.shop.ShopSign;
 import org.lushplugins.lushcontainershops.utils.BlockUtils;
 import org.lushplugins.lushlib.utils.BlockPosition;
 
+import java.util.UUID;
+
 public class ContainerListener implements Listener {
 
     @EventHandler
@@ -35,7 +37,8 @@ public class ContainerListener implements Listener {
         }
 
         HumanEntity player = event.getPlayer();
-        if (!shopContainer.isOwner(player.getUniqueId())) {
+        UUID uuid = player.getUniqueId();
+        if (!shopContainer.isOwner(uuid) && !shopContainer.isStocker(uuid)) {
             if (player.hasPermission("lushcontainershops.bypass")) {
                 LushContainerShops.getInstance().getConfigManager().sendMessage(player, "bypassed-protection");
             } else {
