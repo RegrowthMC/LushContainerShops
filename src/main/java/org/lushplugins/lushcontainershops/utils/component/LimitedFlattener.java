@@ -39,7 +39,7 @@ public class LimitedFlattener implements FlattenerListener {
 
         String shortenedText;
         if (text.length() > this.remainingLimit) {
-            shortenedText = text.substring(0, this.remainingLimit - 1);
+            shortenedText = text.substring(0, this.remainingLimit - 1).strip() + "...";
         } else {
             shortenedText = text;
         }
