@@ -135,6 +135,15 @@ public class ShopItem {
         return flattern.getResult();
     }
 
+    public ShopItem withAmount(int amount) {
+        return new ShopItem(
+            this.material,
+            amount,
+            this.displayName,
+            this.customModelData
+        );
+    }
+
     public static @NotNull ShopItem from(ItemStack item) {
         String displayName = null;
         Integer customModelData = null;

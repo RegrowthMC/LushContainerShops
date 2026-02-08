@@ -234,23 +234,27 @@ public class SignListener implements Listener {
         String rawProduct = event.getLine(1);
         if (rawProduct != null) {
             try {
-                ShopItem product = ShopItem.parseString(rawProduct);
-                if (LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_PRODUCT))) {
-                    shop.setProduct(product);
+                int newAmount = Integer.parseInt(rawProduct.split(" ")[0]);
+                ShopItem currentProduct = shop.getProduct();
+                if (currentProduct != null && currentProduct.getAmount() != newAmount) {
+                    if (LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_PRODUCT))) {
+                        shop.setProduct(currentProduct.withAmount(newAmount));
+                    }
                 }
-
-                shop.setProduct(ShopItem.parseString(rawProduct));
-            } catch (IllegalArgumentException ignored) {}
+            } catch (NumberFormatException ignored) {}
         }
 
         String rawCost = event.getLine(2);
         if (rawCost != null) {
             try {
-                ShopItem cost = ShopItem.parseString(rawCost);
-                if (LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST))) {
-                    shop.setCost(cost);
+                int newAmount = Integer.parseInt(rawCost.split(" ")[0]);
+                ShopItem currentCost = shop.getCost();
+                if (currentCost != null && currentCost.getAmount() != newAmount) {
+                    if (LushContainerShops.getInstance().callEvent(new ShopSignPrepareEvent(shop, ShopSignPrepareEvent.Step.SET_COST))) {
+                        shop.setCost(currentCost.withAmount(newAmount));
+                    }
                 }
-            } catch (IllegalArgumentException ignored) {}
+            } catch (NumberFormatException ignored) {}
         }
 
         shop.updateSignState(event.lines());
