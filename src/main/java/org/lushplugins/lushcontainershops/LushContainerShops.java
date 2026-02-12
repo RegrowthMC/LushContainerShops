@@ -36,13 +36,7 @@ public class LushContainerShops extends SpigotPlugin {
         this.configManager = new ConfigManager();
         this.configManager.reloadConfig();
 
-        PluginManager pluginManager = getServer().getPluginManager();
-        if (pluginManager.getPlugin("packetevents") != null) {
-            this.packetEventsHook = new PacketEventsHook();
-        }
-
-        //noinspection Convert2MethodRef
-//        addHook("packetevents", () -> new PacketEventsHook());
+        ifPluginPresent("packetevents", () -> this.packetEventsHook = new PacketEventsHook());
 
         registerListener(new ContainerListener());
         registerListener(new SignListener());
