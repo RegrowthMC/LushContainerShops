@@ -12,7 +12,7 @@ import org.lushplugins.lushcontainershops.api.event.ShopSignPrepareEvent;
 import org.lushplugins.lushcontainershops.shop.ShopContainer;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
-import org.lushplugins.lushcontainershops.utils.PlayerNameCache;
+import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.SuggestOnlinePlayers;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.Equipment;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.RayTrace;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.Stocker;
@@ -20,6 +20,7 @@ import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
+import revxrsal.commands.bukkit.exception.InvalidPlayerException;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -37,7 +38,12 @@ public class ContainerShopsCommand {
 
     @Subcommand("addstocker")
     @CommandPermission("lushcontainershops.modifystockers")
-    public void addStocker(BukkitCommandActor actor, @RayTrace Block block, Player player) {
+    public void addStocker(BukkitCommandActor actor, @RayTrace Block block, @SuggestOnlinePlayers String stocker) {
+        OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(stocker);
+        if (player == null || !player.hasPlayedBefore()) {
+            throw new InvalidPlayerException(stocker);
+        }
+
         ShopContainer shop = ShopContainer.from(block);
         if (shop == null) {
             LushContainerShops.getInstance().getConfigManager().sendMessage(actor.sender(), "not-shop-container");
@@ -73,7 +79,7 @@ public class ContainerShopsCommand {
     public void removeStocker(BukkitCommandActor actor, @RayTrace Block block, @Stocker String stocker) {
         OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(stocker);
         if (player == null) {
-            return;
+            throw new InvalidPlayerException(stocker);
         }
 
         ShopContainer shop = ShopContainer.from(block);

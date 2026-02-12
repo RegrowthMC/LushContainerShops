@@ -1,6 +1,7 @@
 package org.lushplugins.lushcontainershops;
 
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.lushplugins.lushcontainershops.command.ContainerShopsCommand;
 import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.hook.PacketEventsHook;
@@ -9,6 +10,7 @@ import org.lushplugins.lushcontainershops.listener.SignListener;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.EquipmentContextParameter;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.RayTraceContextParameter;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.StockerSuggestionProvider;
+import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.SuggestOnlinePlayers;
 import org.lushplugins.lushcontainershops.utils.lamp.response.MessageResponseHandler;
 import org.lushplugins.lushlib.libraries.jackson.databind.ObjectMapper;
 import org.lushplugins.lushlib.plugin.SpigotPlugin;
@@ -43,7 +45,8 @@ public class LushContainerShops extends SpigotPlugin {
 
         Lamp<BukkitCommandActor> lamp = BukkitLamp.builder(this)
             .suggestionProviders(providers -> providers
-                .addProviderFactory(new StockerSuggestionProvider()))
+                .addProviderFactory(new StockerSuggestionProvider())
+                .addProviderForAnnotation(SuggestOnlinePlayers.class, annotation -> context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).toList()))
             .parameterTypes(parameters -> {
                 parameters.addContextParameterFactory(new EquipmentContextParameter());
                 parameters.addContextParameterFactory(new RayTraceContextParameter());
