@@ -1,5 +1,8 @@
 name: Create Release on Version Update
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -8,9 +11,6 @@ on:
 jobs:
   create_release:
     runs-on: ubuntu-latest
-
-    env:
-      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -33,28 +33,6 @@ jobs:
           VERSION=$(grep -oP 'version = "\K[0-9]+\.[0-9]+\.[0-9]+' build.gradle.kts)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Check if version is release ready
-        uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match
-        with:
-          text: ${{ env.FULL_VERSION }}
-          regex: '[a-zA-Z]'
-          flags: gm
-
-      - name: Set project release type
-        if: ${{ steps.regex-match.outputs.match == '' }}
-        run: |
-          if git show-ref --tags --verify --quiet "refs/tags/v${{ env.VERSION }}"; then
-            echo "RELEASE_TYPE=alpha" >> $GITHUB_ENV
-          else
-            echo "RELEASE_TYPE=release" >> $GITHUB_ENV
-          fi
-
-      - name: Set project release type
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        run: |
-          echo "RELEASE_TYPE=alpha" >> $GITHUB_ENV
-
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
@@ -62,17 +40,11 @@ jobs:
 
       - name: Post GitHub Release
         uses: svenstaro/upload-release-action@v2
-        if: env.RELEASE_TYPE == 'release'
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/libs/*.jar
           file_glob: true
-          asset_name: ${{ github.event.repository.name }}-${{ env.VERSION }}
-          tag: v${{ env.VERSION }}
+          asset_name: ${{ github.event.repository.name }}-${{ env.FULL_VERSION }}
+          tag: v${{ env.FULL_VERSION }}
           overwrite: false
-
-      - name: Post Modrinth Release
-        if: false
-        run: |
-          chmod +x ./gradlew
-          ./gradlew modrinth
