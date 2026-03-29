@@ -12,9 +12,9 @@ import org.lushplugins.lushcontainershops.utils.lamp.parameter.RayTraceContextPa
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.StockerSuggestionProvider;
 import org.lushplugins.lushcontainershops.utils.lamp.parameter.annotation.SuggestOnlinePlayers;
 import org.lushplugins.lushcontainershops.utils.lamp.response.MessageResponseHandler;
+import org.lushplugins.lushlib.jackson.JacksonHelper;
 import org.lushplugins.lushlib.libraries.jackson.databind.ObjectMapper;
-import org.lushplugins.lushlib.plugin.SpigotPlugin;
-import org.lushplugins.lushlib.serializer.JacksonHelper;
+import org.lushplugins.lushlib.utils.plugin.SpigotPlugin;
 import revxrsal.commands.Lamp;
 import revxrsal.commands.bukkit.BukkitLamp;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;

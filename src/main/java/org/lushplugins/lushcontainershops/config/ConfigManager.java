@@ -7,8 +7,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.lushcontainershops.LushContainerShops;
-import org.lushplugins.lushlib.libraries.chatcolor.ChatColorHandler;
-import org.lushplugins.lushlib.registry.RegistryUtils;
+import org.lushplugins.lushlib.libraries.chatcolor.paper.PaperColor;
+import org.lushplugins.lushlib.utils.registry.RegistryUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class ConfigManager {
             message = parser.apply(message);
         }
 
-        ChatColorHandler.sendMessage(recipient, message);
+        PaperColor.handler().sendMessage(recipient, message);
     }
 
     public void sendMessage(@NotNull CommandSender recipient, @NotNull String key) {
