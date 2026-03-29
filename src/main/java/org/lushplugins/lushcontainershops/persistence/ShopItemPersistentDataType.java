@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushlib.libraries.jackson.core.JsonProcessingException;
-import org.lushplugins.lushlib.utils.DisplayItemStack;
 
 public class ShopItemPersistentDataType implements PersistentDataType<String, ShopItem> {
     public static final ShopItemPersistentDataType INSTANCE = new ShopItemPersistentDataType();

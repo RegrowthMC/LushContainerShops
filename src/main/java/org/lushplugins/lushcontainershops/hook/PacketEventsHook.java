@@ -31,19 +31,16 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.shop.ShopItem;
 import org.lushplugins.lushcontainershops.shop.ShopSign;
-import org.lushplugins.lushlib.hook.Hook;
 import org.lushplugins.lushlib.utils.BlockPosition;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-public class PacketEventsHook extends Hook implements org.bukkit.event.Listener {
+public class PacketEventsHook implements org.bukkit.event.Listener {
     private final HashMultimap<String, WrapperEntity> chunkEntityMap = HashMultimap.create();
 
     public PacketEventsHook() {
-        super("packetevents");
-
         EntityLib.init(
             new SpigotEntityLibPlatform(LushContainerShops.getInstance()),
             new APIConfig(PacketEvents.getAPI()));

@@ -1,6 +1,6 @@
 package org.lushplugins.lushcontainershops.utils.lamp.response;
 
-import org.lushplugins.lushlib.libraries.chatcolor.ChatColorHandler;
+import org.lushplugins.lushlib.libraries.chatcolor.paper.PaperColor;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 import revxrsal.commands.node.ExecutionContext;
 import revxrsal.commands.response.ResponseHandler;
@@ -9,6 +9,6 @@ public class MessageResponseHandler implements ResponseHandler<BukkitCommandActo
 
     @Override
     public void handleResponse(String string, ExecutionContext<BukkitCommandActor> context) {
-        ChatColorHandler.sendMessage(context.actor().sender(), string);
+        PaperColor.handler().sendMessage(context.actor().sender(), string);
     }
 }

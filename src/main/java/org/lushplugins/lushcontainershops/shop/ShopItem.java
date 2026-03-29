@@ -10,15 +10,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.config.ConfigManager;
-import org.lushplugins.lushcontainershops.utils.RegistryUtils;
 import org.lushplugins.lushcontainershops.utils.StringUtils;
 import org.lushplugins.lushcontainershops.utils.component.LimitedFlattener;
-import org.lushplugins.lushlib.libraries.chatcolor.ChatColorHandler;
-import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
+import org.lushplugins.lushlib.libraries.chatcolor.paper.PaperColor;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonAutoDetect;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonCreator;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonInclude;
 import org.lushplugins.lushlib.libraries.jackson.annotation.JsonProperty;
+import org.lushplugins.lushlib.utils.registry.RegistryUtils;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -65,9 +64,9 @@ public class ShopItem {
 
     public String getItemName() {
         if (this.displayName != null) {
-            return ChatColorHandler.translate(this.displayName);
+            return PaperColor.handler().translateRaw(this.displayName);
         } else {
-            return ChatColorHandler.translate(StringUtils.makeFriendly(this.material.key().value().replace("_", " ")));
+            return PaperColor.handler().translateRaw(StringUtils.makeFriendly(this.material.key().value().replace("_", " ")));
         }
     }
 
@@ -124,11 +123,11 @@ public class ShopItem {
     }
 
     public Component asTextComponent() {
-        return ModernChatColorHandler.translate(this.asString());
+        return PaperColor.handler().translate(this.asString());
     }
 
     public Component asTextComponent(int lineCharLimit) {
-        Component component = ModernChatColorHandler.translate(this.asString());
+        Component component = PaperColor.handler().translate(this.asString());
 
         LimitedFlattener flattern = new LimitedFlattener(lineCharLimit);
         ComponentFlattener.basic().flatten(component, flattern);

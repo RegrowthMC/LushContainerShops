@@ -11,11 +11,11 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lushplugins.chatcolorhandler.paper.PaperColor;
 import org.lushplugins.lushcontainershops.LushContainerShops;
 import org.lushplugins.lushcontainershops.config.ConfigManager;
 import org.lushplugins.lushcontainershops.utils.SignUtils;
 import org.lushplugins.lushcontainershops.utils.StringUtils;
-import org.lushplugins.lushlib.libraries.chatcolor.ModernChatColorHandler;
 import org.lushplugins.lushlib.utils.BlockPosition;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class ShopSign extends ShopBlock {
         ConfigManager configManager = LushContainerShops.getInstance().getConfigManager();
         int lineCharLimit = this.isHanging() ? 10 : 15;
 
-        lines.set(0, ModernChatColorHandler.translate(configManager.getMessageOrEmpty("header-color") + configManager.getMessage("header")));
+        lines.set(0, PaperColor.handler().translate(configManager.getMessageOrEmpty("header-color") + configManager.getMessage("header")));
 
         ShopItem product = this.getProduct();
         if (product != null) {
@@ -86,7 +86,7 @@ public class ShopSign extends ShopBlock {
             }
         }
 
-        Component statusComponent = ModernChatColorHandler.translate(status);
+        Component statusComponent = PaperColor.handler().translate(status);
         if (statusComponent instanceof TextComponent statusTextComponent) {
             String content = statusTextComponent.content();
             statusComponent = statusTextComponent.content(StringUtils.shortenString(content, lineCharLimit));
